@@ -25,6 +25,28 @@ MODELS = {
         },
         'optimizer': 'adam',
         'learning_rate': 0.001,
-        'lr_patience': 2
+        'scheduler_kwargs': {
+            'patience': 2
+        }
+    },
+
+    'unet_efficientnet_b0': {
+        'name': 'unet_efficientnet_b0',
+        'epoch': 20,
+        'batch_size': 32,
+        'network': 'unet',
+        'network_kwargs': {
+            'encoder_name': 'efficientnet-b0',
+            'encoder_weights': 'imagenet',
+            'activation': None
+        },
+        'optimizer': 'adam',
+        'learning_rate': 0.001,
+        'scheduler_kwargs': {
+            'factor': 0.25,
+            'patience': 3,
+            'threshold': 0.02,
+            'threshold_mode': 'rel'
+        }
     }
 }

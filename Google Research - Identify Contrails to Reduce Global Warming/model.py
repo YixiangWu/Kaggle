@@ -27,7 +27,7 @@ class Model:
             network_kwargs=None,
             optimizer='adam',
             learning_rate=0.001,
-            lr_patience=2
+            scheduler_kwargs=None
     ):
         self.name = name
         self.epoch = epoch
@@ -55,7 +55,9 @@ class Model:
 
         self.criterion = smp.losses.DiceLoss(mode='binary')
         self.optimizer = OPTIMIZERS[optimizer.lower()](self.network.parameters(), lr=learning_rate)
-        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='max', patience=lr_patience)
+        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            self.optimizer, mode='min', verbose=True, **scheduler_kwargs
+        )
         self.global_dice_coefficient_saving_threshold = GLOBAL_DICE_COEFFICIENT_SAVING_THRESHOLD
 
     def train(self, plot=True):
@@ -71,7 +73,6 @@ class Model:
             )
             global_dice_coefficient = 0
             for i, (image, target) in pbar:
-                pbar.set_description(f'Epoch-{epoch}-Train (Learning_Rate-{self.optimizer.param_groups[0]["lr"]})')
                 image, target = image.to(DEVICE), target.to(DEVICE)
                 self.optimizer.zero_grad()  # clear gradients for every batch
                 prediction = self.network(image)  # feedforward
@@ -97,7 +98,7 @@ class Model:
                 global_dice_coefficient += 1 - self.criterion(prediction, target).item()
                 pbar.set_postfix(global_dice_coefficient=round(global_dice_coefficient / (i + 1), 3))
             validation_global_dice_coefficients.append(global_dice_coefficient / len(self.validation_dataloader))
-            self.scheduler.step(validation_global_dice_coefficients[-1])  # adjust learning rate
+            self.scheduler.step(1 - validation_global_dice_coefficients[-1])  # adjust learning rate
 
             if validation_global_dice_coefficients[-1] > self.global_dice_coefficient_saving_threshold:  # save model
                 if not os.path.exists(os.path.join(Path.DATA_PATH, 'network', self.name)):
