@@ -1,3 +1,5 @@
+import json
+import os
 import torch
 
 
@@ -12,41 +14,5 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else \
 
 GLOBAL_DICE_COEFFICIENT_SAVING_THRESHOLD = 0.5
 
-MODELS = {
-    'unet_resnet34': {
-        'name': 'unet_resnet34',
-        'epoch': 20,
-        'batch_size': 32,
-        'network': 'unet',
-        'network_kwargs': {
-            'encoder_name': 'resnet34',
-            'encoder_weights': 'imagenet',
-            'activation': None
-        },
-        'optimizer': 'adam',
-        'learning_rate': 0.001,
-        'scheduler_kwargs': {
-            'patience': 2
-        }
-    },
-
-    'unet_efficientnet_b0': {
-        'name': 'unet_efficientnet_b0',
-        'epoch': 20,
-        'batch_size': 32,
-        'network': 'unet',
-        'network_kwargs': {
-            'encoder_name': 'efficientnet-b0',
-            'encoder_weights': 'imagenet',
-            'activation': None
-        },
-        'optimizer': 'adam',
-        'learning_rate': 0.001,
-        'scheduler_kwargs': {
-            'factor': 0.25,
-            'patience': 3,
-            'threshold': 0.02,
-            'threshold_mode': 'rel'
-        }
-    }
-}
+with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'models.json')) as file:
+    MODELS = json.loads(file.read())

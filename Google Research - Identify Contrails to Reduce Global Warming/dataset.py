@@ -7,9 +7,10 @@ from config import Path
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, train_data=True):
+    def __init__(self, train_data=True, additional_channel=False):
         self.path = os.path.join(Path.DATA_PATH, 'train' if train_data else 'validation')
         self.record_ids = os.listdir(self.path)
+        self.additional_channel = additional_channel
 
     def __len__(self):
         return len(self.record_ids)
@@ -17,7 +18,7 @@ class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         image = torch.from_numpy(np.load(os.path.join(self.path, self.record_ids[idx], 'image.npy')))
         target = torch.from_numpy(np.load(os.path.join(self.path, self.record_ids[idx], 'target.npy')))
-        return torch.moveaxis(image, -1, 0).float(), torch.moveaxis(target, -1, 0).float()
+        return image.float() if self.additional_channel else image[:3].float(), target.float()
 
 
 def display_image(image, mask):
@@ -43,4 +44,4 @@ if __name__ == '__main__':
     # show random image from the training data set
     train_dataloader = torch.utils.data.DataLoader(Dataset(), shuffle=True)
     image, target = next(iter(train_dataloader))
-    display_image(torch.moveaxis(image[0], 0, -1), torch.moveaxis(target[0], 0, -1))
+    display_image(torch.moveaxis(image[0], 0, -1), target[0][0])

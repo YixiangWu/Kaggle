@@ -1,0 +1,61 @@
+{
+    "unet_resnet34": {
+        "name": "unet_resnet34",
+        "epoch": 20,
+        "batch_size": 32,
+        "network": "unet",
+        "network_kwargs": {
+            "encoder_name": "resnet34",
+            "encoder_weights": "imagenet",
+            "activation": null
+        },
+        "optimizer": "adam",
+        "learning_rate": 0.001,
+        "scheduler_kwargs": {
+            "patience": 2
+        },
+        "additional_channel": false
+    },
+
+    "unet_efficientnet_b0": {
+        "name": "unet_efficientnet_b0",
+        "epoch": 20,
+        "batch_size": 32,
+        "network": "unet",
+        "network_kwargs": {
+            "encoder_name": "efficientnet-b0",
+            "encoder_weights": "imagenet",
+            "activation": null
+        },
+        "optimizer": "adam",
+        "learning_rate": 0.001,
+        "scheduler_kwargs": {
+            "factor": 0.25,
+            "patience": 3,
+            "threshold": 0.02,
+            "threshold_mode": "rel"
+        },
+        "additional_channel": false
+    },
+
+    "unet_efficientnet_b0_additional_channel": {
+        "name": "unet_efficientnet_b0_additional_channel",
+        "epoch": 20,
+        "batch_size": 32,
+        "network": "unet",
+        "network_kwargs": {
+            "encoder_name": "efficientnet-b0",
+            "encoder_weights": "imagenet",
+            "activation": null
+        },
+        "optimizer": "adam",
+        "learning_rate": 0.001,
+        "scheduler_kwargs": {
+            "factor": 0.25,
+            "patience": 3,
+            "threshold": 0.02,
+            "threshold_mode": "rel"
+        },
+        "additional_channel": true
+    }
+}

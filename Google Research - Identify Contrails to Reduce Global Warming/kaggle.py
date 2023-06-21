@@ -4,8 +4,8 @@ import pandas as pd
 import torch
 import tqdm
 
-from config import DEVICE, Path
-from preprocess import load_image_in_ash_rgb
+from config import DEVICE, MODELS, Path
+from preprocess import load_image
 
 
 def rle_encode(mask):
@@ -20,7 +20,10 @@ def rle_encode(mask):
     return str(run_lengths).replace('[', '').replace(']', '').replace(',', '') if run_lengths else '-'
 
 
-def submit(network_name):
+def submit(model_name):
+    network_name = MODELS[model_name]['name']
+    additional_channel = MODELS[model_name]['additional_channel']
+
     best = sorted(os.listdir(os.path.join(Path.DATA_PATH, 'network', network_name)))[-1]
     network = torch.load(os.path.join(Path.DATA_PATH, 'network', network_name, best), map_location=DEVICE)
     network.eval()
@@ -28,8 +31,8 @@ def submit(network_name):
 
     submission = pd.read_csv(os.path.join(Path.ORI_DATA_PATH, 'sample_submission.csv'), index_col='record_id')
     for record_id in tqdm.tqdm(os.listdir(os.path.join(Path.ORI_DATA_PATH, 'test')), desc='Testing'):
-        image = load_image_in_ash_rgb(os.path.join(Path.ORI_DATA_PATH, 'test', record_id))
-        image = torch.moveaxis(torch.from_numpy(image), -1, 0).float().to(DEVICE)
+        image = torch.from_numpy(load_image(os.path.join(Path.ORI_DATA_PATH, 'test', record_id))).float().to(DEVICE)
+        image = image[:] if additional_channel else image[:3]
 
         prediction = network.predict(image.unsqueeze(0))[0][0]
         prediction = prediction.cpu().numpy()

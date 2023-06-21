@@ -27,22 +27,23 @@ class Model:
             network_kwargs=None,
             optimizer='adam',
             learning_rate=0.001,
-            scheduler_kwargs=None
+            scheduler_kwargs=None,
+            additional_channel=False
     ):
         self.name = name
         self.epoch = epoch
         self.batch_size = batch_size
-        self.channel_size = 3
+        self.channel_size = 4 if additional_channel else 3
         self.image_size = (256, 256)
         self.input_size = (self.batch_size, self.channel_size, *self.image_size)
 
         self.train_dataloader = torch.utils.data.DataLoader(
-            Dataset(train_data=True),
+            Dataset(train_data=True, additional_channel=additional_channel),
             batch_size=self.batch_size,
             shuffle=True
         )
         self.validation_dataloader = torch.utils.data.DataLoader(
-            Dataset(train_data=False),
+            Dataset(train_data=False, additional_channel=additional_channel),
             batch_size=self.batch_size,
             shuffle=False
         )
