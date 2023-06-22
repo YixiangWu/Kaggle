@@ -6,6 +6,7 @@ import tqdm
 
 from config import DEVICE, MODELS, Path
 from preprocess import load_image
+from utilities import ensemble
 
 
 def rle_encode(mask):
@@ -21,23 +22,27 @@ def rle_encode(mask):
 
 
 def submit(model_name):
-    network_name = MODELS[model_name]['name']
-    additional_channel = MODELS[model_name]['additional_channel']
+    network_name = MODELS[model_name][0]['name']
+    k_fold = MODELS[model_name][0]['k_fold']
+    additional_channel = MODELS[model_name][0]['additional_channel']
+    voting_ensemble = MODELS[model_name][1]['voting_ensemble']
+    network_filenames = os.listdir(os.path.join(Path.DATA_PATH, 'network', network_name))
 
-    best = sorted(os.listdir(os.path.join(Path.DATA_PATH, 'network', network_name)))[-1]
-    network = torch.load(os.path.join(Path.DATA_PATH, 'network', network_name, best), map_location=DEVICE)
-    network.eval()
-    torch.set_grad_enabled(False)
+    # load networks
+    networks = list()
+    if not k_fold:
+        best = sorted(network_filenames)[-1]
+        networks.append(torch.load(os.path.join(Path.DATA_PATH, 'network', network_name, best), map_location=DEVICE))
+    else:
+        for name in network_filenames:
+            if name[:len(network_name) + 6] == f'{network_name}_fold_':
+                networks.append(torch.load(os.path.join(Path.DATA_PATH, 'network', network_name, name), map_location=DEVICE))
 
     submission = pd.read_csv(os.path.join(Path.ORI_DATA_PATH, 'sample_submission.csv'), index_col='record_id')
     for record_id in tqdm.tqdm(os.listdir(os.path.join(Path.ORI_DATA_PATH, 'test')), desc='Testing'):
         image = torch.from_numpy(load_image(os.path.join(Path.ORI_DATA_PATH, 'test', record_id))).float().to(DEVICE)
         image = image[:] if additional_channel else image[:3]
-
-        prediction = network.predict(image.unsqueeze(0))[0][0]
-        prediction = prediction.cpu().numpy()
-        prediction[prediction > 0] = 1
-        prediction[prediction <= 0] = 0
+        prediction = ensemble(networks, image, voting_ensemble=voting_ensemble)
         submission.loc[int(record_id), 'encoded_pixels'] = rle_encode(prediction)
     submission.to_csv('submission.csv')
 
