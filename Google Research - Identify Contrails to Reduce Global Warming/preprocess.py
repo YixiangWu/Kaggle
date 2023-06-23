@@ -34,10 +34,10 @@ def data_preprocess(train_data=True):
         image = load_image(os.path.join(Path.ORI_DATA_PATH, data_set_type, record_id))
         target = np.moveaxis(np.load(os.path.join(Path.ORI_DATA_PATH, data_set_type, record_id, 'human_pixel_masks.npy')), -1, 0)
 
-        if not os.path.exists(os.path.join(Path.DATA_PATH, data_set_type, record_id)):
-            os.makedirs(os.path.join(Path.DATA_PATH, data_set_type, record_id))
-        np.save(os.path.join(Path.DATA_PATH, data_set_type, record_id, 'image.npy'), image)
-        np.save(os.path.join(Path.DATA_PATH, data_set_type, record_id, 'target.npy'), target)
+        if not os.path.exists(os.path.join(Path.DATA_PATH, 'data', record_id)):
+            os.makedirs(os.path.join(Path.DATA_PATH, 'data', record_id))
+        np.save(os.path.join(Path.DATA_PATH, 'data', record_id, 'image.npy'), image)
+        np.save(os.path.join(Path.DATA_PATH, 'data', record_id, 'target.npy'), target)
 
 
 if __name__ == '__main__':

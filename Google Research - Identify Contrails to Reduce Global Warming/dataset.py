@@ -7,8 +7,8 @@ from config import Path
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, train_data=True, additional_channel=False):
-        self.path = os.path.join(Path.DATA_PATH, 'train' if train_data else 'validation')
+    def __init__(self, additional_channel=False):
+        self.path = os.path.join(Path.DATA_PATH, 'data')
         self.record_ids = os.listdir(self.path)
         self.additional_channel = additional_channel
 

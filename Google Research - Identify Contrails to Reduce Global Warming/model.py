@@ -47,14 +47,12 @@ class Model:
         self.optimizer = optimizer
         self.learning_rate = learning_rate
         self.scheduler_kwargs = scheduler_kwargs
-        self.additional_channel = additional_channel
 
-        self.train_dataloader = None
-        self.validation_dataloader = None
+        self.dataset = Dataset(additional_channel=additional_channel)
 
         self.criterion = smp.losses.DiceLoss(mode='binary')
 
-    def __train(self, fold=0):
+    def __train(self, train_dataloader, validation_dataloader, fold=0):
         network = NETWORKS[self.network.lower()](**self.network_kwargs)
         optimizer = OPTIMIZERS[self.optimizer.lower()](network.parameters(), lr=self.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -68,8 +66,7 @@ class Model:
             network.train()
             torch.set_grad_enabled(True)
             pbar = tqdm.tqdm(
-                enumerate(self.train_dataloader),
-                total=len(self.train_dataloader),
+                enumerate(train_dataloader), total=len(train_dataloader),
                 desc=f'Fold-{fold}-Epoch-{epoch}-Train' if fold else f'Epoch-{epoch}-Train'
             )
             global_dice_coefficient = 0
@@ -82,14 +79,13 @@ class Model:
                 optimizer.step()  # update parameters
                 global_dice_coefficient += 1 - loss.item()
                 pbar.set_postfix(global_dice_coefficient=round(global_dice_coefficient / (i + 1), 3))
-            train_global_dice_coefficients.append(global_dice_coefficient / len(self.train_dataloader))
+            train_global_dice_coefficients.append(global_dice_coefficient / len(train_dataloader))
 
             # validation
             network.eval()
             torch.set_grad_enabled(False)
             pbar = tqdm.tqdm(
-                enumerate(self.validation_dataloader),
-                total=len(self.validation_dataloader),
+                enumerate(validation_dataloader), total=len(validation_dataloader),
                 desc=f'Fold-{fold}-Epoch-{epoch}-Validation' if fold else f'Epoch-{epoch}-Validation'
             )
             global_dice_coefficient = 0
@@ -98,7 +94,7 @@ class Model:
                 prediction = network(image)
                 global_dice_coefficient += 1 - self.criterion(prediction, target).item()
                 pbar.set_postfix(global_dice_coefficient=round(global_dice_coefficient / (i + 1), 3))
-            validation_global_dice_coefficients.append(global_dice_coefficient / len(self.validation_dataloader))
+            validation_global_dice_coefficients.append(global_dice_coefficient / len(validation_dataloader))
             scheduler.step(1 - validation_global_dice_coefficients[-1])  # adjust learning rate
 
         info = f'{self.name}_fold_{fold}' if fold else self.name
@@ -118,32 +114,22 @@ class Model:
 
     def train(self):
         if not self.k_fold:
-            self.train_dataloader = torch.utils.data.DataLoader(
-                Dataset(train_data=True, additional_channel=self.additional_channel),
-                batch_size=self.batch_size, shuffle=True
-            )
-            self.validation_dataloader = torch.utils.data.DataLoader(
-                Dataset(train_data=False, additional_channel=self.additional_channel),
-                batch_size=self.batch_size, shuffle=False
-            )
-            self.__train()
+            train_dataset, validation_dataset = torch.utils.data.random_split(self.dataset, [0.8, 0.2])
+            train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+            validation_dataloader = torch.utils.data.DataLoader(validation_dataset, batch_size=self.batch_size, shuffle=False)
+            self.__train(train_dataloader, validation_dataloader)
         else:  # K-Fold Cross Validation
-            dataset = torch.utils.data.ConcatDataset([
-                Dataset(train_data=True, additional_channel=self.additional_channel),
-                Dataset(train_data=False, additional_channel=self.additional_channel)
-            ])
             k_fold = sklearn.model_selection.KFold(n_splits=self.k_fold, shuffle=True)
-
-            for fold, (train_indices, validation_indices) in enumerate(k_fold.split(dataset), start=1):
-                self.train_dataloader = torch.utils.data.DataLoader(
-                    dataset, batch_size=self.batch_size,
+            for fold, (train_indices, validation_indices) in enumerate(k_fold.split(self.dataset), start=1):
+                train_dataloader = torch.utils.data.DataLoader(
+                    self.dataset, batch_size=self.batch_size,
                     sampler=torch.utils.data.SubsetRandomSampler(train_indices)
                 )
-                self.validation_dataloader = torch.utils.data.DataLoader(
-                    dataset, batch_size=self.batch_size,
+                validation_dataloader = torch.utils.data.DataLoader(
+                    self.dataset, batch_size=self.batch_size,
                     sampler=torch.utils.data.SubsetRandomSampler(validation_indices)
                 )
-                self.__train(fold=fold)
+                self.__train(train_dataloader, validation_dataloader, fold=fold)
 
 
 if __name__ == '__main__':
