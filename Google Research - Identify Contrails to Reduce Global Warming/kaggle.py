@@ -21,11 +21,11 @@ def rle_encode(mask):
     return str(run_lengths).replace('[', '').replace(']', '').replace(',', '') if run_lengths else '-'
 
 
-def submit(model_name):
-    network_name = MODELS[model_name][0]['name']
-    k_fold = MODELS[model_name][0]['k_fold']
-    additional_channel = MODELS[model_name][0]['additional_channel']
-    voting_ensemble = MODELS[model_name][1]['voting_ensemble']
+def submit(model_info):
+    network_name = model_info[0]['name']
+    k_fold = model_info[0]['k_fold']
+    additional_channel = model_info[0]['additional_channel']
+    voting_ensemble = model_info[1]['voting_ensemble']
     network_filenames = os.listdir(os.path.join(Path.DATA_PATH, 'network', network_name))
 
     # load networks
@@ -48,4 +48,4 @@ def submit(model_name):
 
 
 if __name__ == '__main__':
-    submit('unet_resnet34')
+    submit(MODELS['Early Exploration']['unet_resnet34'])
