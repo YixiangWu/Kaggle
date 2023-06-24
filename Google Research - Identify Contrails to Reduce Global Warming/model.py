@@ -35,6 +35,7 @@ class Model:
             epoch=20,
             batch_size=32,
             k_fold=5,
+            voting_ensemble=True,
             network='unet',
             network_kwargs=None,
             criterion='dice_loss',
@@ -48,6 +49,7 @@ class Model:
         self.epoch = epoch
         self.batch_size = batch_size
         self.k_fold = k_fold
+        self.voting_ensemble = voting_ensemble
         self.channel_size = 4 if additional_channel else 3
         self.image_size = (256, 256)
         self.input_size = (self.batch_size, self.channel_size, *self.image_size)
@@ -63,7 +65,8 @@ class Model:
         self.scheduler_kwargs = scheduler_kwargs
         if self.scheduler == 'reduce_on_plateau' and not self.scheduler_kwargs:
             self.scheduler_kwargs = dict(patience=3)
-        self.dataset = Dataset(additional_channel=additional_channel)
+        self.additional_channel = additional_channel
+        self.dataset = Dataset(additional_channel=self.additional_channel)
 
         self.network_archives = list()
         self.path_to_save = os.path.join(Path.DATA_PATH, 'network', self.name)
@@ -119,7 +122,7 @@ class Model:
             network_archive['validation losses'].append(cumulative_loss / len(validation_dataloader))
             scheduler.step(network_archive['validation losses'][-1])  # adjust learning rate
 
-        network_archive['network'] = network
+        network_archive['network'] = network.state_dict()
         network_archive['criterion'], network_archive['loss'] = self.criterion, network_archive['validation losses'][-1]
         network_archive['global dice coefficient'] = cumulative_global_dice_coefficient / len(validation_dataloader)
         self.network_archives.append(network_archive)
@@ -171,5 +174,5 @@ if __name__ == '__main__':
     #     model = Model(**MODELS['Early Exploration'][model][0])
     #     model.train()
 
-    model = Model(**MODELS['Early Exploration']['unet_resnet34'][0])
+    model = Model(**MODELS['Early Exploration']['unet_resnet34'])
     model.train()
