@@ -20,7 +20,9 @@
             "scheduler_kwargs": {
                 "patience": 2
             },
-            "additional_channel": false
+            "additional_channel": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
         },
 
         "unet_efficientnet_b0": {
@@ -45,7 +47,9 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
-            "additional_channel": false
+            "additional_channel": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
         },
 
         "unet_efficientnet_b0_additional_channel": {
@@ -70,7 +74,9 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
-            "additional_channel": true
+            "additional_channel": true,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
         },
 
         "unet_efficientnet_b0_kfold_3": {
@@ -95,7 +101,9 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
-            "additional_channel": false
+            "additional_channel": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
         },
 
         "unet_efficientnet_b0_kfold_5": {
@@ -120,7 +128,73 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
-            "additional_channel": false
+            "additional_channel": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        }
+    },
+
+    "Backbone":
+    {
+        "backbone_unet_efficientnet_b0": {
+            "name": "backbone_unet_efficientnet_b0",
+            "epoch": 20,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "efficientnet-b0",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.01,
+            "scheduler": "reduce_on_plateau",
+            "scheduler_kwargs": {
+                "factor": 0.025,
+                "patience": 1,
+                "cooldown": 2
+            },
+            "additional_channel": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        }
+    },
+
+    "Classification":
+    {
+        "classification_backbone_unet_efficientnet_b0": {
+            "name": "classification_backbone_unet_efficientnet_b0",
+            "epoch": 12,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.005,
+            "scheduler": "reduce_on_plateau",
+            "scheduler_kwargs": {
+                "factor": 0.025,
+                "patience": 1,
+                "cooldown": 2
+            },
+            "additional_channel": false,
+            "backbone": {
+                "feature_extractor": {
+                    "category": "Backbone",
+                    "name": "backbone_unet_efficientnet_b0",
+                    "module": "encoder"
+                },
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
         }
     }
 }

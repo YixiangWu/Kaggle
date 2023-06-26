@@ -7,18 +7,26 @@ from config import Path
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, additional_channel=False):
+    def __init__(self, additional_channel=False, variant=None):
         self.path = os.path.join(Path.DATA_PATH, 'data')
         self.record_ids = os.listdir(self.path)
         self.additional_channel = additional_channel
+        self.variant = variant
 
     def __len__(self):
         return len(self.record_ids)
 
     def __getitem__(self, idx):
-        image = torch.from_numpy(np.load(os.path.join(self.path, self.record_ids[idx], 'image.npy')))
-        target = torch.from_numpy(np.load(os.path.join(self.path, self.record_ids[idx], 'target.npy')))
-        return image.float() if self.additional_channel else image[:3].float(), target.float()
+        image = np.load(os.path.join(self.path, self.record_ids[idx], 'image.npy'))
+        target = np.load(os.path.join(self.path, self.record_ids[idx], 'target.npy'))
+
+        if not self.additional_channel:
+            image = image[:3]
+
+        if self.variant == 'classes':
+            target = np.array([0, 1]) if len(np.unique(target)) == 1 else np.array([1, 0])
+
+        return torch.from_numpy(image).float(), torch.from_numpy(target).float()
 
 
 def display_image(image, mask):

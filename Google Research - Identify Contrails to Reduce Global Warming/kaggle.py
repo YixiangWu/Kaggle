@@ -5,9 +5,9 @@ import torch
 import tqdm
 
 from config import DEVICE, MODELS, Path
-from model import Model, NETWORKS
+from model import Model
 from preprocess import load_image
-from utilities import ensemble
+from utilities import ensemble, load_networks
 
 
 def rle_encode(mask):
@@ -23,16 +23,7 @@ def rle_encode(mask):
 
 
 def submit(model):
-    # load networks
-    networks = list()
-    network_filenames = os.listdir(os.path.join(Path.DATA_PATH, 'network', model.name))
-    filenames_to_load = [filename for filename in network_filenames if filename[:len(model.name) + 6] == f'{model.name}_fold_'] if \
-        model.k_fold else [sorted(network_filenames)[-1]]  # [sorted(network_filenames)[-1]] <- best among all in the directory
-    for filename in filenames_to_load:
-        network = NETWORKS[model.network](**model.network_kwargs)
-        network.load_state_dict(torch.load(os.path.join(Path.DATA_PATH, 'network', model.name, filename), map_location=DEVICE))
-        networks.append(network.to(DEVICE))
-
+    networks = load_networks(model.name, model.k_fold, model.network, model.network_kwargs)
     submission = pd.read_csv(os.path.join(Path.ORI_DATA_PATH, 'sample_submission.csv'), index_col='record_id')
     for record_id in tqdm.tqdm(os.listdir(os.path.join(Path.ORI_DATA_PATH, 'test')), desc='Testing'):
         image = torch.from_numpy(load_image(os.path.join(Path.ORI_DATA_PATH, 'test', record_id))).float().to(DEVICE)

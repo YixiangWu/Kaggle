@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import segmentation_models_pytorch as smp
 import sigfig
@@ -8,14 +9,13 @@ import tqdm
 
 from config import DEVICE, MODELS, Path
 from dataset import Dataset
+from network import NETWORKS
+from utilities import load_networks
 
-
-NETWORKS = {
-    'unet': smp.Unet
-}
 
 CRITERION = {
     'bce_loss': torch.nn.BCEWithLogitsLoss(),
+    'cross_entropy_loss': torch.nn.CrossEntropyLoss(),
     'dice_loss': smp.losses.DiceLoss(mode='binary')
 }
 
@@ -43,7 +43,9 @@ class Model:
             learning_rate=0.001,
             scheduler='reduce_on_plateau',
             scheduler_kwargs=None,
-            additional_channel=False
+            additional_channel=False,
+            backbone=None,
+            metric='global_dice_coefficient'
     ):
         self.name = name
         self.epoch = epoch
@@ -54,10 +56,7 @@ class Model:
         self.image_size = (256, 256)
         self.input_size = (self.batch_size, self.channel_size, *self.image_size)
         self.network = network.lower()
-        self.network_kwargs = network_kwargs
-        if self.network == 'unet':
-            self.network_kwargs['in_channels'] = self.channel_size
-            self.network_kwargs['classes'] = 1
+        self.network_kwargs = self.__update_network_kwargs(self.network, network_kwargs, additional_channel)
         self.criterion = criterion.lower()
         self.optimizer = optimizer.lower()
         self.learning_rate = learning_rate
@@ -66,21 +65,63 @@ class Model:
         if self.scheduler == 'reduce_on_plateau' and not self.scheduler_kwargs:
             self.scheduler_kwargs = dict(patience=3)
         self.additional_channel = additional_channel
-        self.dataset = Dataset(additional_channel=self.additional_channel)
 
+        self.backbone = True if backbone else False
+        if self.backbone:
+            # load feature extractor
+            feature_extractor_info = MODELS[backbone['feature_extractor']['category']][backbone['feature_extractor']['name']]
+            self.feature_extractor_network_kwargs = self.__update_network_kwargs(
+                feature_extractor_info['network'].lower(),
+                feature_extractor_info['network_kwargs'],
+                feature_extractor_info['additional_channel']
+            )
+            self.feature_extractor = load_networks(
+                feature_extractor_info['name'], feature_extractor_info['k_fold'],
+                feature_extractor_info['network'].lower(), self.feature_extractor_network_kwargs
+            )[0].__dict__['_modules'][backbone['feature_extractor']['module']]
+            self.feature_extractor.to(DEVICE)
+            self.feature_extractor.eval()
+
+            # initialize head
+            self.head_network = backbone['head']['network'].lower()
+            self.head_network_kwargs = backbone['head']['network_kwargs']
+            if self.head_network == 'cls_head':
+                if not self.head_network_kwargs:
+                    self.head_network_kwargs = dict()
+
+                sample = torch.zeros(self.input_size).to(DEVICE)
+                self.head_network_kwargs['channels'] = self.feature_extractor(sample)[-1].shape[1]
+
+            self.network_kwargs['feature_extractor'] = self.feature_extractor
+            self.network_kwargs['head'] = NETWORKS[self.head_network](**self.head_network_kwargs)
+
+        self.dataset = Dataset(additional_channel=self.additional_channel, variant='classes' if backbone else None)
+
+        self.metric = metric
         self.network_archives = list()
         self.path_to_save = os.path.join(Path.DATA_PATH, 'network', self.name)
         if not os.path.exists(self.path_to_save):
             os.makedirs(self.path_to_save)
 
+    @staticmethod
+    def __update_network_kwargs(network, network_kwargs, additional_channel):
+        if not network_kwargs:
+            network_kwargs = dict()
+
+        if network == 'unet':
+            network_kwargs['in_channels'] = 4 if additional_channel else 3
+            network_kwargs['classes'] = 1
+        return network_kwargs
+
     def __train(self, train_dataloader, validation_dataloader, fold=0):
-        network = NETWORKS[self.network](**self.network_kwargs)
+        network = NETWORKS[self.network](**self.network_kwargs) if not self.backbone else \
+            NETWORKS[self.head_network](**self.head_network_kwargs)
         criterion = CRITERION[self.criterion]
         optimizer = OPTIMIZERS[self.optimizer](network.parameters(), lr=self.learning_rate)
         scheduler = SCHEDULER[self.scheduler](optimizer, verbose=True, **self.scheduler_kwargs)
 
         network.to(DEVICE)
-        cumulative_global_dice_coefficient = 0
+        metric = 0
         network_archive = dict([('name', self.name), ('k fold', self.k_fold), ('train losses', list()), ('validation losses', list())])
         for epoch in range(1, self.epoch + 1):
             # train
@@ -94,7 +135,8 @@ class Model:
             for i, (image, target) in pbar:
                 image, target = image.to(DEVICE), target.to(DEVICE)
                 optimizer.zero_grad()  # clear gradients for every batch
-                prediction = network(image)  # feedforward
+                network_input = image if not self.backbone else self.feature_extractor(image)[-1]
+                prediction = network(network_input)  # feedforward
                 loss = criterion(prediction, target)  # calculate loss
                 loss.backward()  # backpropagation
                 optimizer.step()  # update parameters
@@ -109,22 +151,32 @@ class Model:
                 enumerate(validation_dataloader), total=len(validation_dataloader),
                 desc=f'Fold-{fold}-Epoch-{epoch}-Validation' if fold else f'Epoch-{epoch}-Validation'
             )
-            cumulative_loss, cumulative_global_dice_coefficient = 0, 0
+            cumulative_loss, metric = 0, 0
             for i, (image, target) in pbar:
                 image, target = image.to(DEVICE), target.to(DEVICE)
-                prediction = network(image)
+                network_input = image if not self.backbone else self.feature_extractor(image)[-1]
+                prediction = network(network_input)
                 cumulative_loss += criterion(prediction, target).item()
-                cumulative_global_dice_coefficient += 1 - CRITERION['dice_loss'](prediction, target).item()
-                pbar.set_postfix(dict([
-                    (self.criterion, sigfig.round(cumulative_loss / (i + 1), sigfigs=3)),
-                    ('global_dice_coefficient', sigfig.round(cumulative_global_dice_coefficient / (i + 1), sigfigs=3))
-                ]))
+                if self.metric == 'global_dice_coefficient':
+                    metric = (metric * i + 1 - CRITERION['dice_loss'](prediction, target).item()) / (i + 1)
+                elif self.metric == 'accuracy':
+                    correct_classes = np.count_nonzero(np.array([
+                        1 if (prediction[i][0] > prediction[i][1] and target[i][0] == 1) or \
+                             (prediction[i][0] < prediction[i][1] and target[i][1] == 1) else 0 \
+                        for i in range(len(image))
+                    ]))
+                    metric = (metric * i * self.batch_size + correct_classes) / ((i + 1) * self.batch_size)
+                pbar.set_postfix(dict([(self.criterion, sigfig.round(cumulative_loss / (i + 1), sigfigs=3)), (self.metric, metric)]))
             network_archive['validation losses'].append(cumulative_loss / len(validation_dataloader))
             scheduler.step(network_archive['validation losses'][-1])  # adjust learning rate
 
+        if self.backbone:
+            self.network_kwargs['feature_extractor'] = self.feature_extractor
+            self.network_kwargs['head'] = network
+            network = NETWORKS[self.network](**self.network_kwargs)
         network_archive['network'] = network.state_dict()
         network_archive['criterion'], network_archive['loss'] = self.criterion, network_archive['validation losses'][-1]
-        network_archive['global dice coefficient'] = cumulative_global_dice_coefficient / len(validation_dataloader)
+        network_archive['metric name'], network_archive['metric'] = self.metric, metric
         self.network_archives.append(network_archive)
 
     def plot(self, fold=1):
@@ -137,9 +189,9 @@ class Model:
         plt.clf()
 
     def save_network(self, fold=1):
-        filename = '{}_global_dice_coefficient_{:05d}_{}_{:05d}.pt'.format(
+        filename = '{}_{}_{:05d}_{}_{:05d}.pt'.format(
             self.network_archives[fold - 1]['name'] + (f'_fold_{fold}' if self.network_archives[fold - 1]['k fold'] else ''),
-            int(self.network_archives[fold - 1]['global dice coefficient'] * 1e5 // 1),
+            self.network_archives[fold - 1]['metric name'], int(self.network_archives[fold - 1]['metric'] * 1e5 // 1),
             self.network_archives[fold - 1]['criterion'], int(self.network_archives[fold - 1]['loss'] * 1e5 // 1)
         )
         torch.save(self.network_archives[fold - 1]['network'], os.path.join(self.path_to_save, filename))
