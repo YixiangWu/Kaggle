@@ -23,3 +23,17 @@
 | # |  Backbone  |                    Head                    |     Criterion      | Loss  | Accuracy |
 |:-:|:----------:|:------------------------------------------:|:------------------:|:-----:|:--------:|
 | 1 | Backbone#1 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.366 |  0.818   |
+
+## Segmentation Stage
+
+### Segmentation
+
+| # | Model |    Encoder     | Weights  | Filter | Criterion | Loss  | Global Dice Coefficient |
+|:-:|:-----:|:--------------:|:--------:|:------:|:---------:|:-----:|:-----------------------:|
+| 1 | U-Net | EfficientNetB0 | ImageNet |   On   | Dice Loss | 0.341 |          0.659          |
+
+## Classification Stage + Segmentation Stage
+
+| # |      Classification      |      Segmentation      | Global Dice Coefficient |
+|:-:|:------------------------:|:----------------------:|:-----------------------:|
+| 1 | Classification#1 (0.818) | Segmentation#1 (0.659) |          0.588          |

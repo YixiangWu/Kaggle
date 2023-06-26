@@ -43,7 +43,9 @@ class Model:
             learning_rate=0.001,
             scheduler='reduce_on_plateau',
             scheduler_kwargs=None,
+            train_test_ratio=0.8,
             additional_channel=False,
+            filter=False,
             backbone=None,
             metric='global_dice_coefficient'
     ):
@@ -64,7 +66,9 @@ class Model:
         self.scheduler_kwargs = scheduler_kwargs
         if self.scheduler == 'reduce_on_plateau' and not self.scheduler_kwargs:
             self.scheduler_kwargs = dict(patience=3)
+        self.train_test_ratio = train_test_ratio
         self.additional_channel = additional_channel
+        self.filter = filter
 
         self.backbone = True if backbone else False
         if self.backbone:
@@ -96,6 +100,12 @@ class Model:
             self.network_kwargs['head'] = NETWORKS[self.head_network](**self.head_network_kwargs)
 
         self.dataset = Dataset(additional_channel=self.additional_channel, variant='classes' if backbone else None)
+        if self.filter:
+            indices_to_keep = list()
+            for i, (_, target) in enumerate(self.dataset):
+                if len(torch.unique(target)) == 2:
+                    indices_to_keep.append(i)
+            self.dataset = torch.utils.data.Subset(self.dataset, indices_to_keep)
 
         self.metric = metric
         self.network_archives = list()
@@ -199,7 +209,7 @@ class Model:
 
     def train(self):
         if not self.k_fold:
-            train_dataset, validation_dataset = torch.utils.data.random_split(self.dataset, [0.8, 0.2])
+            train_dataset, validation_dataset = torch.utils.data.random_split(self.dataset, [self.train_test_ratio, 1 - self.train_test_ratio])
             train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
             validation_dataloader = torch.utils.data.DataLoader(validation_dataset, batch_size=self.batch_size, shuffle=False)
             self.__train(train_dataloader, validation_dataloader)

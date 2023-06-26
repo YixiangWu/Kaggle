@@ -20,7 +20,9 @@
             "scheduler_kwargs": {
                 "patience": 2
             },
+            "train_test_ratio": 0.8,
             "additional_channel": false,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         },
@@ -47,7 +49,9 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
+            "train_test_ratio": 0.8,
             "additional_channel": false,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         },
@@ -74,7 +78,9 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
+            "train_test_ratio": 0.8,
             "additional_channel": true,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         },
@@ -101,7 +107,9 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
+            "train_test_ratio": 0.8,
             "additional_channel": false,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         },
@@ -128,7 +136,9 @@
                 "threshold": 0.02,
                 "threshold_mode": "rel"
             },
+            "train_test_ratio": 0.8,
             "additional_channel": false,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         }
@@ -157,7 +167,9 @@
                 "patience": 1,
                 "cooldown": 2
             },
+            "train_test_ratio": 0.8,
             "additional_channel": false,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         }
@@ -182,7 +194,9 @@
                 "patience": 1,
                 "cooldown": 2
             },
+            "train_test_ratio": 0.8,
             "additional_channel": false,
+            "filter": false,
             "backbone": {
                 "feature_extractor": {
                     "category": "Backbone",
@@ -195,6 +209,38 @@
                 }
             },
             "metric": "accuracy"
+        }
+    },
+
+    "Segmentation":
+    {
+        "segmentation_unet_efficientnet_b0": {
+            "name": "segmentation_unet_efficientnet_b0",
+            "epoch": 30,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "efficientnet-b0",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.01,
+            "scheduler": "reduce_on_plateau",
+            "scheduler_kwargs": {
+                "factor": 0.25,
+                "patience": 3,
+                "threshold": 0.02,
+                "threshold_mode": "rel"
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "filter": true,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
         }
     }
 }
