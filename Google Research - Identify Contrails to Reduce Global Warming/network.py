@@ -30,5 +30,6 @@ class ClassificationHead(torch.nn.Module):
 NETWORKS = {
     'cls': Classification,
     'cls_head': ClassificationHead,
-    'unet': smp.Unet
+    'unet': smp.Unet,
+    'unet++': smp.UnetPlusPlus
 }

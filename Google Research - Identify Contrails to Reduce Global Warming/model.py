@@ -7,7 +7,7 @@ import sklearn.model_selection
 import torch
 import tqdm
 
-from config import DEVICE, MODELS, Path
+from config import DEVICE, MODELS, NUM_WORKERS, Path
 from dataset import Dataset
 from network import NETWORKS
 from utilities import load_networks
@@ -24,6 +24,8 @@ OPTIMIZERS = {
 }
 
 SCHEDULER = {
+    'exponential': torch.optim.lr_scheduler.ExponentialLR,
+    'multi_step': torch.optim.lr_scheduler.MultiStepLR,
     'reduce_on_plateau': torch.optim.lr_scheduler.ReduceLROnPlateau
 }
 
@@ -64,8 +66,13 @@ class Model:
         self.learning_rate = learning_rate
         self.scheduler = scheduler.lower()
         self.scheduler_kwargs = scheduler_kwargs
-        if self.scheduler == 'reduce_on_plateau' and not self.scheduler_kwargs:
-            self.scheduler_kwargs = dict(patience=3)
+        if not self.scheduler_kwargs:
+            if self.scheduler == 'exponential':
+                self.scheduler_kwargs = dict(gamma=0.95)
+            elif self.scheduler == 'multi_step':
+                self.scheduler_kwargs = dict(milestones=list(range(5, self.epoch + 1, 5)))
+            elif self.scheduler == 'reduce_on_plateau':
+                self.scheduler_kwargs = dict(patience=3)
         self.train_test_ratio = train_test_ratio
         self.additional_channel = additional_channel
         self.filter = filter
@@ -100,6 +107,7 @@ class Model:
             self.network_kwargs['head'] = NETWORKS[self.head_network](**self.head_network_kwargs)
 
         self.dataset = Dataset(additional_channel=self.additional_channel, variant='classes' if backbone else None)
+        self.dataloader_kwargs = dict(num_workers=NUM_WORKERS, pin_memory=True if DEVICE == torch.device('cuda') else False)
         if self.filter:
             indices_to_keep = list()
             for i, (_, target) in enumerate(self.dataset):
@@ -178,7 +186,7 @@ class Model:
                     metric = (metric * i * self.batch_size + correct_classes) / ((i + 1) * self.batch_size)
                 pbar.set_postfix(dict([(self.criterion, sigfig.round(cumulative_loss / (i + 1), sigfigs=3)), (self.metric, metric)]))
             network_archive['validation losses'].append(cumulative_loss / len(validation_dataloader))
-            scheduler.step(network_archive['validation losses'][-1])  # adjust learning rate
+            scheduler.step(network_archive['validation losses'][-1]) if self.scheduler == 'reduce_on_plateau' else scheduler.step()  # adjust learning rate
 
         if self.backbone:
             self.network_kwargs['feature_extractor'] = self.feature_extractor
@@ -210,8 +218,8 @@ class Model:
     def train(self):
         if not self.k_fold:
             train_dataset, validation_dataset = torch.utils.data.random_split(self.dataset, [self.train_test_ratio, 1 - self.train_test_ratio])
-            train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
-            validation_dataloader = torch.utils.data.DataLoader(validation_dataset, batch_size=self.batch_size, shuffle=False)
+            train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, **self.dataloader_kwargs)
+            validation_dataloader = torch.utils.data.DataLoader(validation_dataset, batch_size=self.batch_size, shuffle=False, **self.dataloader_kwargs)
             self.__train(train_dataloader, validation_dataloader)
             self.plot()
             self.save_network()
@@ -220,11 +228,11 @@ class Model:
             for fold, (train_indices, validation_indices) in enumerate(k_fold.split(self.dataset), start=1):
                 train_dataloader = torch.utils.data.DataLoader(
                     self.dataset, batch_size=self.batch_size,
-                    sampler=torch.utils.data.SubsetRandomSampler(train_indices)
+                    sampler=torch.utils.data.SubsetRandomSampler(train_indices), **self.dataloader_kwargs
                 )
                 validation_dataloader = torch.utils.data.DataLoader(
                     self.dataset, batch_size=self.batch_size,
-                    sampler=torch.utils.data.SubsetRandomSampler(validation_indices)
+                    sampler=torch.utils.data.SubsetRandomSampler(validation_indices), **self.dataloader_kwargs
                 )
                 self.__train(train_dataloader, validation_dataloader, fold=fold)
                 self.plot(fold)
