@@ -26,12 +26,17 @@
 
 | # |  Model  |    Encoder     | Weights  | Filter | Criterion | Loss  | Global Dice Coefficient |
 |:-:|:-------:|:--------------:|:--------:|:------:|:---------:|:-----:|:-----------------------:|
-| 2 | U-Net++ | EfficientNetB0 | ImageNet |   On   | Dice Loss | 0.341 |          0.659          |
+| 6 | U-Net++ | EfficientNetB4 | ImageNet |   On   | Dice Loss | 0.328 |          0.672          |
+| 5 | U-Net++ | EfficientNetB3 | ImageNet |   On   | Dice Loss | 0.333 |          0.667          |
+| 4 | U-Net++ | EfficientNetB2 | ImageNet |   On   | Dice Loss | 0.334 |          0.666          |
+| 3 | U-Net++ | EfficientNetB1 | ImageNet |   On   | Dice Loss | 0.338 |          0.662          |
+| 2 | U-Net++ | EfficientNetB0 | ImageNet |   On   | Dice Loss | 0.338 |          0.662          |
 | 1 |  U-Net  | EfficientNetB0 | ImageNet |   On   | Dice Loss | 0.342 |          0.658          |
 
 ## Classification Stage + Segmentation Stage
 
-| # |      Classification      |      Segmentation      | Global Dice Coefficient |
-|:-:|:------------------------:|:----------------------:|:-----------------------:|
-| 2 | Classification#1 (0.874) | Segmentation#2 (0.659) |          0.605          |
-| 1 | Classification#1 (0.874) | Segmentation#1 (0.658) |          0.605          |
+| # |      Classification      |      Segmentation      | Global Dice Coefficient (Kaggle Public Score) |
+|:-:|:------------------------:|:----------------------:|:---------------------------------------------:|
+| 3 | Classification#3 (0.895) | Segmentation#6 (0.672) |                     0.641                     |
+| 2 | Classification#3 (0.895) | Segmentation#4 (0.666) |                     0.626                     |
+| 1 | Classification#1 (0.874) | Segmentation#1 (0.658) |                     0.605                     |

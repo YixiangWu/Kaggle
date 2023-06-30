@@ -24,6 +24,7 @@ OPTIMIZERS = {
 }
 
 SCHEDULER = {
+    'cosine_annealing_warm_restarts': torch.optim.lr_scheduler.CosineAnnealingWarmRestarts,
     'exponential': torch.optim.lr_scheduler.ExponentialLR,
     'multi_step': torch.optim.lr_scheduler.MultiStepLR,
     'reduce_on_plateau': torch.optim.lr_scheduler.ReduceLROnPlateau
@@ -67,7 +68,9 @@ class Model:
         self.scheduler = scheduler.lower()
         self.scheduler_kwargs = scheduler_kwargs
         if not self.scheduler_kwargs:
-            if self.scheduler == 'exponential':
+            if self.scheduler == 'cosine_annealing_warm_restarts':
+                self.scheduler_kwargs = dict(T_0=6, T_mult=2, eta_min=0.00001)
+            elif self.scheduler == 'exponential':
                 self.scheduler_kwargs = dict(gamma=0.95)
             elif self.scheduler == 'multi_step':
                 self.scheduler_kwargs = dict(milestones=list(range(5, self.epoch + 1, 5)))

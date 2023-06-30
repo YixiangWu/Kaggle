@@ -417,7 +417,7 @@
 
         "segmentation_unetplusplus_efficientnet_b0": {
             "name": "segmentation_unetplusplus_efficientnet_b0",
-            "epoch": 20,
+            "epoch": 21,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
@@ -429,11 +429,124 @@
             },
             "criterion": "dice_loss",
             "optimizer": "adam",
-            "learning_rate": 0.001,
-            "scheduler": "multi_step",
+            "learning_rate": 0.005,
+            "scheduler": "cosine_annealing_warm_restarts",
             "scheduler_kwargs": {
-                "gamma": 0.05,
-                "milestones": [8, 14, 18]
+                "T_0": 3,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "filter": true,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unetplusplus_efficientnet_b1": {
+            "name": "segmentation_unetplusplus_efficientnet_b1",
+            "epoch": 21,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet++",
+            "network_kwargs": {
+                "encoder_name": "efficientnet-b1",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 3,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "filter": true,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unetplusplus_efficientnet_b2": {
+            "name": "segmentation_unetplusplus_efficientnet_b2",
+            "epoch": 21,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet++",
+            "network_kwargs": {
+                "encoder_name": "efficientnet-b2",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 3,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "filter": true,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unetplusplus_efficientnet_b3": {
+            "name": "segmentation_unetplusplus_efficientnet_b3",
+            "epoch": 21,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet++",
+            "network_kwargs": {
+                "encoder_name": "efficientnet-b3",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 3,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "filter": true,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unetplusplus_efficientnet_b4": {
+            "name": "segmentation_unetplusplus_efficientnet_b4",
+            "epoch": 21,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet++",
+            "network_kwargs": {
+                "encoder_name": "efficientnet-b4",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 3,
+                "T_mult": 2,
+                "eta_min": 1e-7
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
