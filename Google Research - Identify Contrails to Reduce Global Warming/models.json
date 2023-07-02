@@ -22,6 +22,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -51,6 +52,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -80,6 +82,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": true,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -109,6 +112,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -138,6 +142,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -168,6 +173,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -195,6 +201,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -222,6 +229,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -249,6 +257,40 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnext50_32x4d": {
+            "name": "backbone_unet_resnext50_32x4d",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "resnext50_32x4d",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.8,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -274,6 +316,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": {
                 "feature_extractor": {
@@ -306,6 +349,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": {
                 "feature_extractor": {
@@ -338,6 +382,7 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": {
                 "feature_extractor": {
@@ -370,11 +415,45 @@
             },
             "train_test_ratio": 0.8,
             "additional_channel": false,
+            "augmentations": null,
             "filter": false,
             "backbone": {
                 "feature_extractor": {
                     "category": "Backbone",
                     "name": "backbone_unet_efficientnet_b3",
+                    "module": "encoder"
+                },
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_resnext50_32x4d": {
+            "name": "classification_backbone_unet_resnext50_32x4d",
+            "epoch": 20,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "exponential",
+            "scheduler_kwargs": {
+                "gamma": 0.95
+            },
+            "train_test_ratio": 0.8,
+            "additional_channel": false,
+            "augmentations": null,
+            "filter": false,
+            "backbone": {
+                "feature_extractor": {
+                    "category": "Backbone",
+                    "name": "backbone_unet_resnext50_32x4d",
                     "module": "encoder"
                 },
                 "head": {
@@ -410,6 +489,7 @@
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
+            "augmentations": null,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -438,6 +518,7 @@
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
+            "augmentations": null,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -466,6 +547,7 @@
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
+            "augmentations": null,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -494,6 +576,7 @@
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
+            "augmentations": null,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -522,6 +605,7 @@
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
+            "augmentations": null,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -550,6 +634,7 @@
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
+            "augmentations": null,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"

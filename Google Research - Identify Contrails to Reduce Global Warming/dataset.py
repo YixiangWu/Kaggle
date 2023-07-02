@@ -1,16 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import random
 import torch
+import torchvision
 
 from config import Path
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, additional_channel=False, variant=None):
+    def __init__(self, additional_channel=False, augmentations=None, variant=None):
         self.path = os.path.join(Path.DATA_PATH, 'data')
         self.record_ids = os.listdir(self.path)
         self.additional_channel = additional_channel
+        self.augmentations = augmentations
         self.variant = variant
 
     def __len__(self):
@@ -23,10 +26,24 @@ class Dataset(torch.utils.data.Dataset):
         if not self.additional_channel:
             image = image[:3]
 
-        if self.variant == 'classes':
-            target = np.array([0, 1]) if len(np.unique(target)) == 1 else np.array([1, 0])
+        image, target = torch.from_numpy(image).float(), torch.from_numpy(target).float()
 
-        return torch.from_numpy(image).float(), torch.from_numpy(target).float()
+        if self.augmentations:
+            if 'horizontal_flip' in self.augmentations and random.random() < self.augmentations['horizontal_flip']:
+                image = torchvision.transforms.functional.hflip(image)
+                target = torchvision.transforms.functional.hflip(target)
+            if 'vertical_flip' in self.augmentations and random.random() < self.augmentations['vertical_flip']:
+                image = torchvision.transforms.functional.vflip(image)
+                target = torchvision.transforms.functional.vflip(target)
+            if 'rotate' in self.augmentations and random.random() < self.augmentations['rotate']:
+                angle = random.choice([-90, 90, 180])
+                image = torchvision.transforms.functional.rotate(image, angle)
+                target = torchvision.transforms.functional.rotate(target, angle)
+
+        if self.variant == 'classes':
+            target = torch.tensor([0, 1]).float() if len(torch.unique(target)) == 1 else torch.tensor([1, 0]).float()
+
+        return image, target
 
 
 def display_image(image, mask):

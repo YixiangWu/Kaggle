@@ -4,17 +4,19 @@
 
 ### Backbone
 
-| # |    Backbone    | Parent Module | Weights  | Criterion |  Loss   | Global Dice Coefficient |
-|:-:|:--------------:|:-------------:|:--------:|:---------:|:-------:|:-----------------------:|
-| 4 | EfficientNetB3 |     U-Net     | ImageNet | BCE Loss  | 0.00876 |          0.524          |
-| 3 | EfficientNetB2 |     U-Net     | ImageNet | BCE Loss  | 0.00875 |          0.515          |
-| 2 | EfficientNetB1 |     U-Net     | ImageNet | BCE Loss  | 0.00896 |          0.508          |
-| 1 | EfficientNetB0 |     U-Net     | ImageNet | BCE Loss  | 0.00895 |          0.503          |
+| # |    Backbone     | Parent Module | Weights  | Augmentation | Criterion |  Loss   | Global Dice Coefficient |
+|:-:|:---------------:|:-------------:|:--------:|:------------:|:---------:|:-------:|:-----------------------:|
+| 5 | ResNext50 32x4D |     U-Net     | ImageNet |      On      | BCE Loss  | 0.00897 |          0.501          |
+| 4 | EfficientNetB3  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00876 |          0.524          |
+| 3 | EfficientNetB2  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00875 |          0.515          |
+| 2 | EfficientNetB1  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00896 |          0.508          |
+| 1 | EfficientNetB0  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00895 |          0.503          |
 
 ### Classification
 
 | # |  Backbone  |                    Head                    |     Criterion      | Loss  | Accuracy |
 |:-:|:----------:|:------------------------------------------:|:------------------:|:-----:|:--------:|
+| 5 | Backbone#5 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.249 |  0.902   |
 | 4 | Backbone#4 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.295 |  0.881   |
 | 3 | Backbone#3 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.272 |  0.895   |
 | 2 | Backbone#2 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.278 |  0.871   |

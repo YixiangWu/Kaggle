@@ -48,6 +48,7 @@ class Model:
             scheduler_kwargs=None,
             train_test_ratio=0.8,
             additional_channel=False,
+            augmentations=False,
             filter=False,
             backbone=None,
             metric='global_dice_coefficient'
@@ -78,6 +79,7 @@ class Model:
                 self.scheduler_kwargs = dict(patience=3)
         self.train_test_ratio = train_test_ratio
         self.additional_channel = additional_channel
+        self.augmentations = augmentations
         self.filter = filter
 
         self.backbone = True if backbone else False
@@ -109,14 +111,24 @@ class Model:
             self.network_kwargs['feature_extractor'] = self.feature_extractor
             self.network_kwargs['head'] = NETWORKS[self.head_network](**self.head_network_kwargs)
 
-        self.dataset = Dataset(additional_channel=self.additional_channel, variant='classes' if backbone else None)
+        self.train_dataset = Dataset(
+            additional_channel=self.additional_channel,
+            augmentations=self.augmentations,
+            variant='classes' if backbone else None
+        )
+        self.validation_dataset = Dataset(
+            additional_channel=self.additional_channel,
+            augmentations=False,
+            variant='classes' if backbone else None
+        )
         self.dataloader_kwargs = dict(num_workers=NUM_WORKERS, pin_memory=True if DEVICE == torch.device('cuda') else False)
         if self.filter:
             indices_to_keep = list()
-            for i, (_, target) in enumerate(self.dataset):
+            for i, (_, target) in enumerate(self.train_dataset):
                 if len(torch.unique(target)) == 2:
                     indices_to_keep.append(i)
-            self.dataset = torch.utils.data.Subset(self.dataset, indices_to_keep)
+            self.train_dataset = torch.utils.data.Subset(self.train_dataset, indices_to_keep)
+            self.validation_dataset = torch.utils.data.Subset(self.validation_dataset, indices_to_keep)
 
         self.metric = metric
         self.network_archives = list()
@@ -220,22 +232,34 @@ class Model:
 
     def train(self):
         if not self.k_fold:
-            train_dataset, validation_dataset = torch.utils.data.random_split(self.dataset, [self.train_test_ratio, 1 - self.train_test_ratio])
-            train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, **self.dataloader_kwargs)
-            validation_dataloader = torch.utils.data.DataLoader(validation_dataset, batch_size=self.batch_size, shuffle=False, **self.dataloader_kwargs)
+            train_indices, validation_indices = sklearn.model_selection.train_test_split(
+                range(len(self.train_dataset)), test_size=1 - self.train_test_ratio, train_size=self.train_test_ratio
+            )
+            train_dataloader = torch.utils.data.DataLoader(
+                self.train_dataset, batch_size=self.batch_size,
+                sampler=torch.utils.data.SubsetRandomSampler(train_indices),
+                **self.dataloader_kwargs
+            )
+            validation_dataloader = torch.utils.data.DataLoader(
+                self.validation_dataset, batch_size=self.batch_size,
+                sampler=torch.utils.data.SubsetRandomSampler(validation_indices),
+                **self.dataloader_kwargs
+            )
             self.__train(train_dataloader, validation_dataloader)
             self.plot()
             self.save_network()
         else:  # K-Fold Cross Validation
             k_fold = sklearn.model_selection.KFold(n_splits=self.k_fold, shuffle=True)
-            for fold, (train_indices, validation_indices) in enumerate(k_fold.split(self.dataset), start=1):
+            for fold, (train_indices, validation_indices) in enumerate(k_fold.split(self.train_dataset), start=1):
                 train_dataloader = torch.utils.data.DataLoader(
-                    self.dataset, batch_size=self.batch_size,
-                    sampler=torch.utils.data.SubsetRandomSampler(train_indices), **self.dataloader_kwargs
+                    self.train_dataset, batch_size=self.batch_size,
+                    sampler=torch.utils.data.SubsetRandomSampler(train_indices),
+                    **self.dataloader_kwargs
                 )
                 validation_dataloader = torch.utils.data.DataLoader(
-                    self.dataset, batch_size=self.batch_size,
-                    sampler=torch.utils.data.SubsetRandomSampler(validation_indices), **self.dataloader_kwargs
+                    self.validation_dataset, batch_size=self.batch_size,
+                    sampler=torch.utils.data.SubsetRandomSampler(validation_indices),
+                    **self.dataloader_kwargs
                 )
                 self.__train(train_dataloader, validation_dataloader, fold=fold)
                 self.plot(fold)
