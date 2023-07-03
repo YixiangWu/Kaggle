@@ -84,19 +84,21 @@ class Model:
 
         self.backbone = True if backbone else False
         if self.backbone:
+            self.feature_extractors = list()
             # load feature extractor
-            feature_extractor_info = MODELS[backbone['feature_extractor']['category']][backbone['feature_extractor']['name']]
-            self.feature_extractor_network_kwargs = self.__update_network_kwargs(
-                feature_extractor_info['network'].lower(),
-                feature_extractor_info['network_kwargs'],
-                feature_extractor_info['additional_channel']
-            )
-            self.feature_extractor = load_networks(
-                feature_extractor_info['name'], feature_extractor_info['k_fold'],
-                feature_extractor_info['network'].lower(), self.feature_extractor_network_kwargs
-            )[0].__dict__['_modules'][backbone['feature_extractor']['module']]
-            self.feature_extractor.to(DEVICE)
-            self.feature_extractor.eval()
+            for feature_extractor in backbone['feature_extractors']:
+                feature_extractor_info = MODELS[feature_extractor['category']][feature_extractor['name']]
+                self.feature_extractor_network_kwargs = self.__update_network_kwargs(
+                    feature_extractor_info['network'].lower(),
+                    feature_extractor_info['network_kwargs'],
+                    feature_extractor_info['additional_channel']
+                )
+                self.feature_extractors.append(load_networks(
+                    feature_extractor_info['name'], feature_extractor_info['k_fold'],
+                    feature_extractor_info['network'].lower(), self.feature_extractor_network_kwargs
+                )[0].__dict__['_modules'][feature_extractor['module']])
+                self.feature_extractors[-1].to(DEVICE)
+                self.feature_extractors[-1].eval()
 
             # initialize head
             self.head_network = backbone['head']['network'].lower()
@@ -106,9 +108,11 @@ class Model:
                     self.head_network_kwargs = dict()
 
                 sample = torch.zeros(self.input_size).to(DEVICE)
-                self.head_network_kwargs['channels'] = self.feature_extractor(sample)[-1].shape[1]
+                self.head_network_kwargs['channels'] = 0
+                for feature_extractor in self.feature_extractors:
+                    self.head_network_kwargs['channels'] += feature_extractor(sample)[-1].shape[1]
 
-            self.network_kwargs['feature_extractor'] = self.feature_extractor
+            self.network_kwargs['feature_extractors'] = self.feature_extractors
             self.network_kwargs['head'] = NETWORKS[self.head_network](**self.head_network_kwargs)
 
         self.train_dataset = Dataset(
@@ -168,7 +172,12 @@ class Model:
             for i, (image, target) in pbar:
                 image, target = image.to(DEVICE), target.to(DEVICE)
                 optimizer.zero_grad()  # clear gradients for every batch
-                network_input = image if not self.backbone else self.feature_extractor(image)[-1]
+                network_input = image
+                if self.backbone:
+                    network_input = torch.tensor([]).to(DEVICE)
+                    for feature_extractor in self.feature_extractors:
+                        network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
+                            network_input.shape[0] != 0 else feature_extractor(image)[-1]
                 prediction = network(network_input)  # feedforward
                 loss = criterion(prediction, target)  # calculate loss
                 loss.backward()  # backpropagation
@@ -187,7 +196,12 @@ class Model:
             cumulative_loss, metric = 0, 0
             for i, (image, target) in pbar:
                 image, target = image.to(DEVICE), target.to(DEVICE)
-                network_input = image if not self.backbone else self.feature_extractor(image)[-1]
+                network_input = image
+                if self.backbone:
+                    network_input = torch.tensor([]).to(DEVICE)
+                    for feature_extractor in self.feature_extractors:
+                        network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
+                            network_input.shape[0] != 0 else feature_extractor(image)[-1]
                 prediction = network(network_input)
                 cumulative_loss += criterion(prediction, target).item()
                 if self.metric == 'global_dice_coefficient':
@@ -204,7 +218,7 @@ class Model:
             scheduler.step(network_archive['validation losses'][-1]) if self.scheduler == 'reduce_on_plateau' else scheduler.step()  # adjust learning rate
 
         if self.backbone:
-            self.network_kwargs['feature_extractor'] = self.feature_extractor
+            self.network_kwargs['feature_extractors'] = self.feature_extractors
             self.network_kwargs['head'] = network
             network = NETWORKS[self.network](**self.network_kwargs)
         network_archive['network'] = network.state_dict()

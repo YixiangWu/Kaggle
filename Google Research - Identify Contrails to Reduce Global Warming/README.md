@@ -14,13 +14,14 @@
 
 ### Classification
 
-| # |  Backbone  |                    Head                    |     Criterion      | Loss  | Accuracy |
-|:-:|:----------:|:------------------------------------------:|:------------------:|:-----:|:--------:|
-| 5 | Backbone#5 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.249 |  0.902   |
-| 4 | Backbone#4 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.295 |  0.881   |
-| 3 | Backbone#3 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.272 |  0.895   |
-| 2 | Backbone#2 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.278 |  0.871   |
-| 1 | Backbone#1 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.319 |  0.874   |
+| # |        Backbone         |                    Head                    |     Criterion      | Loss  | Accuracy |
+|:-:|:-----------------------:|:------------------------------------------:|:------------------:|:-----:|:--------:|
+| 6 | Backbone#3 + Backbone#5 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.212 |  0.919   |
+| 5 |       Backbone#5        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.249 |  0.902   |
+| 4 |       Backbone#4        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.295 |  0.881   |
+| 3 |       Backbone#3        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.272 |  0.895   |
+| 2 |       Backbone#2        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.278 |  0.871   |
+| 1 |       Backbone#1        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.319 |  0.874   |
 
 ## Segmentation Stage
 

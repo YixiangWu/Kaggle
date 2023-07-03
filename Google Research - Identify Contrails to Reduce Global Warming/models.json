@@ -319,11 +319,13 @@
             "augmentations": null,
             "filter": false,
             "backbone": {
-                "feature_extractor": {
-                    "category": "Backbone",
-                    "name": "backbone_unet_efficientnet_b0",
-                    "module": "encoder"
-                },
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_efficientnet_b0",
+                        "module": "encoder"
+                    }
+                ],
                 "head": {
                     "network": "cls_head",
                     "network_kwargs": null
@@ -352,11 +354,13 @@
             "augmentations": null,
             "filter": false,
             "backbone": {
-                "feature_extractor": {
-                    "category": "Backbone",
-                    "name": "backbone_unet_efficientnet_b1",
-                    "module": "encoder"
-                },
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_efficientnet_b1",
+                        "module": "encoder"
+                    }
+                ],
                 "head": {
                     "network": "cls_head",
                     "network_kwargs": null
@@ -385,11 +389,13 @@
             "augmentations": null,
             "filter": false,
             "backbone": {
-                "feature_extractor": {
-                    "category": "Backbone",
-                    "name": "backbone_unet_efficientnet_b2",
-                    "module": "encoder"
-                },
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_efficientnet_b2",
+                        "module": "encoder"
+                    }
+                ],
                 "head": {
                     "network": "cls_head",
                     "network_kwargs": null
@@ -418,11 +424,13 @@
             "augmentations": null,
             "filter": false,
             "backbone": {
-                "feature_extractor": {
-                    "category": "Backbone",
-                    "name": "backbone_unet_efficientnet_b3",
-                    "module": "encoder"
-                },
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_efficientnet_b3",
+                        "module": "encoder"
+                    }
+                ],
                 "head": {
                     "network": "cls_head",
                     "network_kwargs": null
@@ -451,11 +459,53 @@
             "augmentations": null,
             "filter": false,
             "backbone": {
-                "feature_extractor": {
-                    "category": "Backbone",
-                    "name": "backbone_unet_resnext50_32x4d",
-                    "module": "encoder"
-                },
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnext50_32x4d",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_efficientnet_b2_and_resnext50_32x4d": {
+            "name": "classification_backbone_unet_efficientnet_b2_and_resnext50_32x4d",
+            "epoch": 20,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "exponential",
+            "scheduler_kwargs": {
+                "gamma": 0.95
+            },
+            "train_test_ratio": 0.8,
+            "additional_channel": false,
+            "augmentations": null,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_efficientnet_b2",
+                        "module": "encoder"
+                    },
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnext50_32x4d",
+                        "module": "encoder"
+                    }
+                ],
                 "head": {
                     "network": "cls_head",
                     "network_kwargs": null
