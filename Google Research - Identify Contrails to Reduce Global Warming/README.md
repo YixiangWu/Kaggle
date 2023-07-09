@@ -4,24 +4,18 @@
 
 ### Backbone
 
-| # |    Backbone     | Parent Module | Weights  | Augmentation | Criterion |  Loss   | Global Dice Coefficient |
-|:-:|:---------------:|:-------------:|:--------:|:------------:|:---------:|:-------:|:-----------------------:|
-| 5 | ResNext50 32x4D |     U-Net     | ImageNet |      On      | BCE Loss  | 0.00897 |          0.501          |
-| 4 | EfficientNetB3  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00876 |          0.524          |
-| 3 | EfficientNetB2  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00875 |          0.515          |
-| 2 | EfficientNetB1  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00896 |          0.508          |
-| 1 | EfficientNetB0  |     U-Net     | ImageNet |     Off      | BCE Loss  | 0.00895 |          0.503          |
+| # |    Backbone     | Parent Module | Weights  | Criterion |  Loss   | Global Dice Coefficient |
+|:-:|:---------------:|:-------------:|:--------:|:---------:|:-------:|:-----------------------:|
+| 2 | ResNext50 32x4D |     U-Net     | ImageNet | BCE Loss  | 0.00905 |          0.503          |
+| 1 | EfficientNetB0  |     U-Net     | ImageNet | BCE Loss  | 0.00884 |          0.499          |
 
 ### Classification
 
 | # |        Backbone         |                    Head                    |     Criterion      | Loss  | Accuracy |
 |:-:|:-----------------------:|:------------------------------------------:|:------------------:|:-----:|:--------:|
-| 6 | Backbone#3 + Backbone#5 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.212 |  0.919   |
-| 5 |       Backbone#5        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.249 |  0.902   |
-| 4 |       Backbone#4        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.295 |  0.881   |
-| 3 |       Backbone#3        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.272 |  0.895   |
-| 2 |       Backbone#2        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.278 |  0.871   |
-| 1 |       Backbone#1        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.319 |  0.874   |
+| 3 | Backbone#1 + Backbone#2 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.187 |  0.917   |
+| 2 |       Backbone#2        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.231 |  0.898   |
+| 1 |       Backbone#1        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.239 |  0.903   |
 
 ## Segmentation Stage
 
@@ -29,17 +23,17 @@
 
 | # |  Model  |    Encoder     | Weights  | Filter | Criterion | Loss  | Global Dice Coefficient |
 |:-:|:-------:|:--------------:|:--------:|:------:|:---------:|:-----:|:-----------------------:|
-| 6 | U-Net++ | EfficientNetB4 | ImageNet |   On   | Dice Loss | 0.328 |          0.672          |
+| 6 | U-Net++ | EfficientNetB4 | ImageNet |   On   | Dice Loss | 0.327 |          0.673          |
 | 5 | U-Net++ | EfficientNetB3 | ImageNet |   On   | Dice Loss | 0.333 |          0.667          |
-| 4 | U-Net++ | EfficientNetB2 | ImageNet |   On   | Dice Loss | 0.334 |          0.666          |
-| 3 | U-Net++ | EfficientNetB1 | ImageNet |   On   | Dice Loss | 0.338 |          0.662          |
+| 4 | U-Net++ | EfficientNetB2 | ImageNet |   On   | Dice Loss | 0.333 |          0.667          |
+| 3 | U-Net++ | EfficientNetB1 | ImageNet |   On   | Dice Loss | 0.329 |          0.671          |
 | 2 | U-Net++ | EfficientNetB0 | ImageNet |   On   | Dice Loss | 0.338 |          0.662          |
-| 1 |  U-Net  | EfficientNetB0 | ImageNet |   On   | Dice Loss | 0.342 |          0.658          |
+| 1 |  U-Net  | EfficientNetB0 | ImageNet |   On   | Dice Loss | 0.347 |          0.653          |
 
 ## Classification Stage + Segmentation Stage
 
 | # |      Classification      |      Segmentation      | Global Dice Coefficient (Kaggle Public Score) |
 |:-:|:------------------------:|:----------------------:|:---------------------------------------------:|
-| 3 | Classification#3 (0.895) | Segmentation#6 (0.672) |                     0.641                     |
-| 2 | Classification#3 (0.895) | Segmentation#4 (0.666) |                     0.626                     |
-| 1 | Classification#1 (0.874) | Segmentation#1 (0.658) |                     0.605                     |
+| * | Classification#3 (0.917) | Segmentation#3 (0.671) |                     0.638                     |
+| 2 | Classification#2 (0.898) | Segmentation#3 (0.671) |                     0.637                     |
+| 1 | Classification#1 (0.903) | Segmentation#2 (0.662) |                     0.614                     |
