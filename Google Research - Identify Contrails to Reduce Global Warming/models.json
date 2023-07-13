@@ -23,6 +23,7 @@
             "train_test_ratio": 0.8,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -53,6 +54,7 @@
             "train_test_ratio": 0.8,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -83,6 +85,7 @@
             "train_test_ratio": 0.8,
             "additional_channel": true,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -113,6 +116,7 @@
             "train_test_ratio": 0.8,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -143,6 +147,7 @@
             "train_test_ratio": 0.8,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -179,6 +184,7 @@
                 "vertical_flip": 0.5,
                 "rotate": 0.75
             },
+            "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -212,6 +218,7 @@
                 "vertical_flip": 0.5,
                 "rotate": 0.75
             },
+            "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -238,6 +245,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1.5,
             "filter": false,
             "backbone": {
                 "feature_extractors": [
@@ -273,6 +281,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1.5,
             "filter": false,
             "backbone": {
                 "feature_extractors": [
@@ -312,6 +321,7 @@
                 "vertical_flip": 0.5,
                 "rotate": 0.75
             },
+            "resize_factor": 1.5,
             "filter": false,
             "backbone": {
                 "feature_extractors": [
@@ -361,6 +371,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -390,6 +401,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -419,6 +431,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -448,6 +461,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -477,6 +491,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"
@@ -506,6 +521,7 @@
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
+            "resize_factor": 1,
             "filter": true,
             "backbone": null,
             "metric": "global_dice_coefficient"

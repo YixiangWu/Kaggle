@@ -39,14 +39,14 @@ def submit(models):
         prediction = None
 
         if len(models) == 1:
-            prediction = ensemble(networks, image, voting_ensemble=models[0].voting_ensemble)
+            prediction = ensemble(networks, image, models[0].resize, voting_ensemble=models[0].voting_ensemble)
         elif len(models) == 2:  # networks[0]: classification, networks[1:]: segmentation
             networks[0].eval()
             torch.set_grad_enabled(False)
-            prediction = networks[0](image.unsqueeze(0))[0]
+            prediction = networks[0]((models[0].resize[0](image) if models[0].resize else image).unsqueeze(0))[0]
             prediction = prediction.cpu().numpy()
             prediction = np.zeros(models[0].image_size) if prediction[0] < prediction[1] else \
-                ensemble(networks[1:], image, voting_ensemble=models[1].voting_ensemble)
+                ensemble(networks[1:], image, models[1].resize, voting_ensemble=models[1].voting_ensemble)
 
         # from dataset import display_image
         # display_image(np.moveaxis(np.array(image.cpu()), 0, -1), prediction)

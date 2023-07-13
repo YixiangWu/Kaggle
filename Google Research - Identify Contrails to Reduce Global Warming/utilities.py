@@ -6,13 +6,15 @@ from config import DEVICE, Path
 from network import NETWORKS
 
 
-def ensemble(networks, image, voting_ensemble=True):
+def ensemble(networks, image, resize, voting_ensemble=True):
+    if resize:
+        image = resize[0](image)
     predictions = list()
     for network in networks:
         network.eval()
         torch.set_grad_enabled(False)
-        prediction = network.predict(image.unsqueeze(0))[0][0]
-        prediction = prediction.cpu().numpy()
+        prediction = network.predict(image.unsqueeze(0))[0]
+        prediction = (resize[1](prediction) if resize else prediction)[0].cpu().numpy()
         predictions.append(prediction)
 
     if voting_ensemble:  # True: Voting Ensemble; False: Averaging Ensemble

@@ -5,6 +5,7 @@ import segmentation_models_pytorch as smp
 import sigfig
 import sklearn.model_selection
 import torch
+import torchvision
 import tqdm
 
 from config import DEVICE, MODELS, NUM_WORKERS, Path
@@ -48,6 +49,7 @@ class Model:
             train_test_ratio=0.8,
             additional_channel=False,
             augmentations=False,
+            resize_factor=1,
             filter=False,
             backbone=None,
             metric='global_dice_coefficient'
@@ -77,7 +79,20 @@ class Model:
         self.train_test_ratio = train_test_ratio
         self.additional_channel = additional_channel
         self.augmentations = augmentations
+        self.dataset_variant = 'classes' if self.network == 'cls' else None
+        self.resize_factor = resize_factor
         self.filter = filter
+
+        self.resize = None
+        if self.resize_factor != 1:
+            self.resize = list()
+            self.resize.append(torchvision.transforms.Resize(
+                tuple(int(size * self.resize_factor) for size in self.image_size),
+                interpolation=torchvision.transforms.functional.InterpolationMode.BILINEAR, antialias=True
+            ))
+            self.resize.append(torchvision.transforms.Resize(
+                self.image_size, interpolation=torchvision.transforms.functional.InterpolationMode.BILINEAR, antialias=True
+            ))
 
         self.backbone = True if backbone else False
         if self.backbone:
@@ -85,6 +100,7 @@ class Model:
             # load feature extractor
             for feature_extractor in backbone['feature_extractors']:
                 feature_extractor_info = MODELS[feature_extractor['category']][feature_extractor['name']]
+                assert feature_extractor_info['resize_factor'] == self.resize_factor
                 self.feature_extractor_network_kwargs = self.__update_network_kwargs(
                     feature_extractor_info['network'].lower(),
                     feature_extractor_info['network_kwargs'],
@@ -104,7 +120,7 @@ class Model:
                 if not self.head_network_kwargs:
                     self.head_network_kwargs = dict()
 
-                sample = torch.zeros(self.input_size).to(DEVICE)
+                sample = torch.zeros((*self.input_size[:2], *(int(size * self.resize_factor) for size in self.image_size))).to(DEVICE)
                 self.head_network_kwargs['channels'] = 0
                 for feature_extractor in self.feature_extractors:
                     self.head_network_kwargs['channels'] += feature_extractor(sample)[-1].shape[1]
@@ -112,16 +128,8 @@ class Model:
             self.network_kwargs['feature_extractors'] = self.feature_extractors
             self.network_kwargs['head'] = NETWORKS[self.head_network](**self.head_network_kwargs)
 
-        self.train_dataset = Dataset(
-            additional_channel=self.additional_channel,
-            augmentations=self.augmentations,
-            variant='classes' if backbone else None
-        )
-        self.validation_dataset = Dataset(
-            additional_channel=self.additional_channel,
-            augmentations=False,
-            variant='classes' if backbone else None
-        )
+        self.train_dataset = Dataset(additional_channel=self.additional_channel, augmentations=self.augmentations, variant=self.dataset_variant)
+        self.validation_dataset = Dataset(additional_channel=self.additional_channel, augmentations=False, variant=self.dataset_variant)
         self.dataloader_kwargs = dict(num_workers=NUM_WORKERS, pin_memory=True if DEVICE == torch.device('cuda') else False)
         if self.filter:
             indices_to_keep = list()
@@ -169,6 +177,8 @@ class Model:
             for i, (image, target) in pbar:
                 image, target = image.to(DEVICE), target.to(DEVICE)
                 optimizer.zero_grad()  # clear gradients for every batch
+                if self.resize:
+                    image = self.resize[0](image[:])
                 network_input = image
                 if self.backbone:
                     network_input = torch.tensor([]).to(DEVICE)
@@ -176,6 +186,8 @@ class Model:
                         network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
                             network_input.shape[0] != 0 else feature_extractor(image)[-1]
                 prediction = network(network_input)  # feedforward
+                if self.resize and self.dataset_variant != 'classes':
+                    prediction = self.resize[1](prediction[:])
                 loss = criterion(prediction, target)  # calculate loss
                 loss.backward()  # backpropagation
                 optimizer.step()  # update parameters
@@ -193,6 +205,8 @@ class Model:
             cumulative_loss, metric = 0, 0
             for i, (image, target) in pbar:
                 image, target = image.to(DEVICE), target.to(DEVICE)
+                if self.resize:
+                    image = self.resize[0](image[:])
                 network_input = image
                 if self.backbone:
                     network_input = torch.tensor([]).to(DEVICE)
@@ -200,6 +214,8 @@ class Model:
                         network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
                             network_input.shape[0] != 0 else feature_extractor(image)[-1]
                 prediction = network(network_input)
+                if self.resize and self.dataset_variant != 'classes':
+                    prediction = self.resize[1](prediction[:])
                 cumulative_loss += criterion(prediction, target).item()
                 if self.metric == 'global_dice_coefficient':
                     metric = (metric * i + 1 - CRITERION['dice_loss'](prediction, target).item()) / (i + 1)
