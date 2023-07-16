@@ -6,16 +6,18 @@
 
 | # |    Backbone     | Parent Module | Weights  | Criterion |  Loss   | Global Dice Coefficient |
 |:-:|:---------------:|:-------------:|:--------:|:---------:|:-------:|:-----------------------:|
+| 3 | EfficientNetB1  |     U-Net     | ImageNet | BCE Loss  | 0.00834 |          0.532          |
 | 2 | EfficientNetB0  |     U-Net     | ImageNet | BCE Loss  | 0.00855 |          0.517          |
 | 1 | ResNext50 32x4D |     U-Net     | ImageNet | BCE Loss  | 0.00871 |          0.533          |
 
 ### Classification
 
-| # |        Backbone         |                    Head                    |     Criterion      | Loss  | Accuracy |
-|:-:|:-----------------------:|:------------------------------------------:|:------------------:|:-----:|:--------:|
-| 3 | Backbone#1 + Backbone#2 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.182 |  0.927   |
-| 2 |       Backbone#2        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.207 |  0.910   |
-| 1 |       Backbone#1        | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.247 |  0.899   |
+| # |    Backbone    |                    Head                    |     Criterion      | Loss  | Accuracy |
+|:-:|:--------------:|:------------------------------------------:|:------------------:|:-----:|:--------:|
+| * | Backbone#1, #2 | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.178 |  0.933   |
+| 3 |   Backbone#3   | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.203 |  0.922   |
+| 2 |   Backbone#2   | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.214 |  0.918   |
+| 1 |   Backbone#1   | Adaptive Pooling + One Linear Layer + ReLU | Cross Entropy Loss | 0.229 |  0.909   |
 
 ## Segmentation Stage
 
@@ -34,6 +36,6 @@
 
 | # |      Classification      |      Segmentation      | Global Dice Coefficient (Kaggle Public Score) |
 |:-:|:------------------------:|:----------------------:|:---------------------------------------------:|
-| * | Classification#3 (0.927) | Segmentation#3 (0.671) |                     0.631                     |
-| 2 | Classification#2 (0.910) | Segmentation#3 (0.671) |                     0.633                     |
-| 1 | Classification#1 (0.899) | Segmentation#2 (0.662) |                     0.616                     |
+| * | Classification* (0.933)  | Segmentation#3 (0.671) |                     0.631                     |
+| 2 | Classification#2 (0.918) | Segmentation#3 (0.671) |                     0.629                     |
+| 1 | Classification#1 (0.909) | Segmentation#2 (0.662) |                     0.616                     |

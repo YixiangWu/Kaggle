@@ -156,6 +156,40 @@
 
     "Backbone":
     {
+        "backbone_unet_resnext50_32x4d": {
+            "name": "backbone_unet_resnext50_32x4d",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "resnext50_32x4d",
+                "encoder_weights": "imagenet",
+                "activation": null
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
         "backbone_unet_efficientnet_b0": {
             "name": "backbone_unet_efficientnet_b0",
             "epoch": 35,
@@ -190,26 +224,26 @@
             "metric": "global_dice_coefficient"
         },
 
-        "backbone_unet_resnext50_32x4d": {
-            "name": "backbone_unet_resnext50_32x4d",
+        "backbone_unet_efficientnet_b1": {
+            "name": "backbone_unet_efficientnet_b1",
             "epoch": 35,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
             "network": "unet",
             "network_kwargs": {
-                "encoder_name": "resnext50_32x4d",
+                "encoder_name": "efficientnet-b1",
                 "encoder_weights": "imagenet",
                 "activation": null
             },
             "criterion": "bce_loss",
             "optimizer": "adam",
-            "learning_rate": 0.0005,
+            "learning_rate": 0.001,
             "scheduler": "cosine_annealing_warm_restarts",
             "scheduler_kwargs": {
                 "T_0": 5,
                 "T_mult": 2,
-                "eta_min": 0
+                "eta_min": 1e-7
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
@@ -227,42 +261,6 @@
 
     "Classification":
     {
-        "classification_backbone_unet_efficientnet_b0": {
-            "name": "classification_backbone_unet_efficientnet_b0",
-            "epoch": 20,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "cls",
-            "network_kwargs": null,
-            "criterion": "cross_entropy_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.001,
-            "scheduler": "exponential",
-            "scheduler_kwargs": {
-                "gamma": 0.95
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": null,
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": {
-                "feature_extractors": [
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b0",
-                        "module": "encoder"
-                    }
-                ],
-                "head": {
-                    "network": "cls_head",
-                    "network_kwargs": null
-                }
-            },
-            "metric": "accuracy"
-        },
-
         "classification_backbone_unet_resnext50_32x4d": {
             "name": "classification_backbone_unet_resnext50_32x4d",
             "epoch": 20,
@@ -299,8 +297,80 @@
             "metric": "accuracy"
         },
 
-        "classification_backbone_unet_efficientnet_b0_and_resnext50_32x4d": {
-            "name": "classification_backbone_unet_efficientnet_b0_and_resnext50_32x4d",
+        "classification_backbone_unet_efficientnet_b0": {
+            "name": "classification_backbone_unet_efficientnet_b0",
+            "epoch": 20,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "exponential",
+            "scheduler_kwargs": {
+                "gamma": 0.95
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_efficientnet_b0",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_efficientnet_b1": {
+            "name": "classification_backbone_unet_efficientnet_b1",
+            "epoch": 20,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "exponential",
+            "scheduler_kwargs": {
+                "gamma": 0.95
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_efficientnet_b1",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_resnext50_32x4d_and_efficientnet_b0": {
+            "name": "classification_backbone_unet_resnext50_32x4d_and_efficientnet_b0",
             "epoch": 20,
             "batch_size": 32,
             "k_fold": null,
@@ -327,12 +397,12 @@
                 "feature_extractors": [
                     {
                         "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b0",
+                        "name": "backbone_unet_resnext50_32x4d",
                         "module": "encoder"
                     },
                     {
                         "category": "Backbone",
-                        "name": "backbone_unet_resnext50_32x4d",
+                        "name": "backbone_unet_efficientnet_b0",
                         "module": "encoder"
                     }
                 ],

@@ -225,7 +225,7 @@ class Model:
                              (prediction[i][0] < prediction[i][1] and target[i][1] == 1) else 0 \
                         for i in range(len(image))
                     ]))
-                    metric = (metric * i * self.batch_size + correct_classes) / ((i + 1) * self.batch_size)
+                    metric = (metric * i * self.batch_size + correct_classes) / (i * self.batch_size + len(image))
                 pbar.set_postfix(dict([(self.criterion, sigfig.round(cumulative_loss / (i + 1), sigfigs=3)), (self.metric, metric)]))
             network_archive['validation losses'].append(cumulative_loss / len(validation_dataloader))
             scheduler.step(network_archive['validation losses'][-1]) if self.scheduler == 'reduce_on_plateau' else scheduler.step()  # adjust learning rate
