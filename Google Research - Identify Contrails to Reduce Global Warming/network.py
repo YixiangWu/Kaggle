@@ -1,3 +1,4 @@
+import math
 import segmentation_models_pytorch as smp
 import torch
 
@@ -22,14 +23,26 @@ class Classification(torch.nn.Module):
 
 
 class ClassificationHead(torch.nn.Module):
-    def __init__(self, channels):
+    def __init__(self, channels, factor=4, linear_layers=0):
         super().__init__()
-        self.head = torch.nn.Sequential(
-            torch.nn.AdaptiveAvgPool2d(1),
-            torch.nn.Flatten(),
-            torch.nn.Linear(channels, 2, bias=True),
-            torch.nn.ReLU()
-        )
+        if not linear_layers:
+            linear_layers = int(math.log(channels // (256 // factor // factor), factor))
+
+        layers = list()
+        in_channels = channels
+        for i in range(linear_layers):
+            out_channels = in_channels // factor if i < linear_layers - 1 else 2
+            layers.append(torch.nn.Linear(in_channels, out_channels, bias=True))
+            layers.append(torch.nn.BatchNorm1d(out_channels))
+            layers.append(torch.nn.ReLU(inplace=True))
+            in_channels = out_channels
+
+        self.head = torch.nn.Sequential(torch.nn.AdaptiveAvgPool2d(1), torch.nn.Flatten(), *layers)
+
+        for module in self.head.modules():
+            if isinstance(module, torch.nn.Linear):
+                torch.nn.init.kaiming_normal_(module.weight, nonlinearity='relu')
+                torch.nn.init.constant_(module.bias, 0)
 
     def forward(self, feature_volume):
         return self.head(feature_volume)
