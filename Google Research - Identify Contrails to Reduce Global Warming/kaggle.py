@@ -7,7 +7,6 @@ import tqdm
 from config import DEVICE, MODELS, Path
 from model import Model
 from preprocess import load_image
-from utilities import ensemble, load_networks
 
 
 def rle_encode(mask):
@@ -22,15 +21,36 @@ def rle_encode(mask):
     return str(run_lengths).replace('[', '').replace(']', '').replace(',', '') if run_lengths else '-'
 
 
+def ensemble(networks, image, resize, voting_ensemble=True):
+    if resize:
+        image = resize[0](image)
+    predictions = list()
+    for network in networks:
+        network.eval()
+        torch.set_grad_enabled(False)
+        prediction = network.predict(image.unsqueeze(0))[0]
+        prediction = (resize[1](prediction) if resize else prediction)[0].cpu().numpy()
+        predictions.append(prediction)
+
+    if voting_ensemble:  # True: Voting Ensemble; False: Averaging Ensemble
+        for i in range(len(predictions)):
+            predictions[i][predictions[i] > 0] = 1
+            predictions[i][predictions[i] <= 0] = -1
+    prediction = np.average(predictions, axis=0)
+    prediction[prediction > 0] = 1
+    prediction[prediction <= 0] = 0
+    return prediction
+
+
 def submit(models):
     if len(models) == 2:  # classification + segmentation
-        assert models[0].input_size == models[1].input_size
+        assert models[0].input_size[1:] == models[1].input_size[1:]
         assert models[0].additional_channel == models[1].additional_channel
 
     # load networks
     networks = list()
     for model in models:
-        networks.extend(load_networks(model.name, model.k_fold, model.network, model.network_kwargs))
+        networks.extend(model.load_networks())
 
     submission = pd.read_csv(os.path.join(Path.ORI_DATA_PATH, 'sample_submission.csv'), index_col='record_id')
     for record_id in tqdm.tqdm(os.listdir(os.path.join(Path.ORI_DATA_PATH, 'test')), desc='Testing'):

@@ -6,19 +6,31 @@
 
 | # |    Backbone     | Parent Module | Weights  | Criterion |  Loss   | Global Dice Coefficient |
 |:-:|:---------------:|:-------------:|:--------:|:---------:|:-------:|:-----------------------:|
+| 6 |    ResNet50     |     U-Net     | ImageNet | BCE Loss  | 0.00838 |          0.519          |
+| 5 |    ResNet34     |     U-Net     | ImageNet | BCE Loss  | 0.00852 |          0.515          |
+| 4 |    ResNet18     |     U-Net     | ImageNet | BCE Loss  | 0.00872 |          0.506          |
 | 3 | EfficientNetB1  |     U-Net     | ImageNet | BCE Loss  | 0.00834 |          0.532          |
 | 2 | EfficientNetB0  |     U-Net     | ImageNet | BCE Loss  | 0.00855 |          0.517          |
 | 1 | ResNext50 32x4D |     U-Net     | ImageNet | BCE Loss  | 0.00871 |          0.533          |
 
 ### Classification
 
-| # |    Backbone    |                                Head                                |     Criterion      | Loss  | Accuracy |
-|:-:|:--------------:|:------------------------------------------------------------------:|:------------------:|:-----:|:--------:|
-| * |  Backbone#1-3  | Adaptive Pooling + 3 * (Linear Layer + Batch Normalization + ReLU) | Cross Entropy Loss | 0.187 |  0.941   |
-| 4 | Backbone#1, #2 | Adaptive Pooling + 3 * (Linear Layer + Batch Normalization + ReLU) | Cross Entropy Loss | 0.199 |  0.931   |
-| 3 |   Backbone#3   | Adaptive Pooling + 2 * (Linear Layer + Batch Normalization + ReLU) | Cross Entropy Loss | 0.210 |  0.925   |
-| 2 |   Backbone#2   | Adaptive Pooling + 2 * (Linear Layer + Batch Normalization + ReLU) | Cross Entropy Loss | 0.211 |  0.925   |
-| 1 |   Backbone#1   | Adaptive Pooling + 3 * (Linear Layer + Batch Normalization + ReLU) | Cross Entropy Loss | 0.223 |  0.918   |
+| # |  Backbone  |     Criterion      | Loss  | Accuracy |
+|:-:|:----------:|:------------------:|:-----:|:--------:|
+| 6 | Backbone#6 | Cross Entropy Loss | 0.219 |  0.929   |
+| 5 | Backbone#5 | Cross Entropy Loss | 0.223 |  0.920   |
+| 4 | Backbone#4 | Cross Entropy Loss | 0.244 |  0.910   |
+| 3 | Backbone#3 | Cross Entropy Loss | 0.210 |  0.925   |
+| 2 | Backbone#2 | Cross Entropy Loss | 0.211 |  0.925   |
+| 1 | Backbone#1 | Cross Entropy Loss | 0.223 |  0.918   |
+
+### Classification Ensemble
+
+| # |        Backbone        |  Ensemble Method   |     Criterion      | Loss  | Accuracy |
+|:-:|:----------------------:|:------------------:|:------------------:|:-----:|:--------:|
+| 3 | Backbone#2, #3, #5, #6 | Stacking (Encoder) | Cross Entropy Loss | 0.191 |  0.945   |
+| 2 |      Backbone#1-3      | Stacking (Encoder) | Cross Entropy Loss | 0.187 |  0.941   |
+| 1 |     Backbone#1, #2     | Stacking (Encoder) | Cross Entropy Loss | 0.199 |  0.931   |
 
 ## Segmentation Stage
 
@@ -35,8 +47,8 @@
 
 ## Classification Stage + Segmentation Stage
 
-| # |      Classification      |      Segmentation      | Global Dice Coefficient (Kaggle Public Score) |
-|:-:|:------------------------:|:----------------------:|:---------------------------------------------:|
-| * | Classification* (0.941)  | Segmentation#3 (0.671) |                     0.638                     |
-| 2 | Classification#2 (0.925) | Segmentation#3 (0.671) |                     0.628                     |
-| 1 | Classification#1 (0.918) | Segmentation#2 (0.662) |                     0.610                     |
+| # |          Classification           |      Segmentation      | Global Dice Coefficient (Kaggle Public Score) |
+|:-:|:---------------------------------:|:----------------------:|:---------------------------------------------:|
+| 3 | Classification Ensemble#2 (0.941) | Segmentation#3 (0.671) |                     0.638                     |
+| 2 |     Classification#2 (0.925)      | Segmentation#3 (0.671) |                     0.628                     |
+| 1 |     Classification#1 (0.918)      | Segmentation#2 (0.662) |                     0.610                     |

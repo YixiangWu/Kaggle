@@ -12,10 +12,8 @@ class Classification(torch.nn.Module):
         self.head = head
 
     def forward(self, input):
-        feature_volumes = torch.tensor([]).to(
-            torch.device('cuda') if torch.cuda.is_available() else
-            (torch.device('mps') if torch.backends.mps.is_available() else torch.device('cpu'))
-        )
+        feature_volumes = torch.tensor([], device=torch.device('cuda') if torch.cuda.is_available() else \
+            (torch.device('mps') if torch.backends.mps.is_available() else torch.device('cpu')))
         for i in range(self.num_extractors):
             feature_volume = self.__dict__['_modules']['feature_extractor_' + str(i)](input)[-1]
             feature_volumes = torch.cat((feature_volumes, feature_volume), dim=1) if feature_volumes.shape[0] != 0 else feature_volume

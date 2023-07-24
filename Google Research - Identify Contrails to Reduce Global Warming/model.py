@@ -11,7 +11,6 @@ import tqdm
 from config import DEVICE, MODELS, NUM_WORKERS, Path
 from dataset import Dataset
 from network import NETWORKS
-from utilities import load_networks
 
 
 CRITERION = {
@@ -63,7 +62,10 @@ class Model:
         self.image_size = (256, 256)
         self.input_size = (self.batch_size, self.channel_size, *self.image_size)
         self.network = network.lower()
-        self.network_kwargs = self.__update_network_kwargs(self.network, network_kwargs, additional_channel)
+        self.network_kwargs = network_kwargs if network_kwargs else dict()
+        if self.network == 'unet' or self.network == 'unet++':
+            self.network_kwargs['in_channels'] = self.channel_size
+            self.network_kwargs['classes'] = 1
         self.criterion = criterion.lower()
         self.optimizer = optimizer.lower()
         self.learning_rate = learning_rate
@@ -101,17 +103,10 @@ class Model:
             for feature_extractor in backbone['feature_extractors']:
                 feature_extractor_info = MODELS[feature_extractor['category']][feature_extractor['name']]
                 assert feature_extractor_info['resize_factor'] == self.resize_factor
-                self.feature_extractor_network_kwargs = self.__update_network_kwargs(
-                    feature_extractor_info['network'].lower(),
-                    feature_extractor_info['network_kwargs'],
-                    feature_extractor_info['additional_channel']
-                )
-                self.feature_extractors.append(load_networks(
-                    feature_extractor_info['name'], feature_extractor_info['k_fold'],
-                    feature_extractor_info['network'].lower(), self.feature_extractor_network_kwargs
-                )[0].__dict__['_modules'][feature_extractor['module']])
-                self.feature_extractors[-1].to(DEVICE)
-                self.feature_extractors[-1].eval()
+                for network in Model(**feature_extractor_info).load_networks():
+                    self.feature_extractors.append(network.__dict__['_modules'][feature_extractor['module']])
+                    self.feature_extractors[-1].to(DEVICE)
+                    self.feature_extractors[-1].eval()
 
             # initialize head
             self.head_network = backbone['head']['network'].lower()
@@ -120,7 +115,7 @@ class Model:
                 if not self.head_network_kwargs:
                     self.head_network_kwargs = dict()
 
-                sample = torch.zeros((*self.input_size[:2], *(int(size * self.resize_factor) for size in self.image_size))).to(DEVICE)
+                sample = torch.zeros((*self.input_size[:2], *(int(size * self.resize_factor) for size in self.image_size)), device=DEVICE)
                 self.head_network_kwargs['channels'] = 0
                 for feature_extractor in self.feature_extractors:
                     self.head_network_kwargs['channels'] += feature_extractor(sample)[-1].shape[1]
@@ -144,16 +139,6 @@ class Model:
         self.path_to_save = os.path.join(Path.DATA_PATH, 'network', self.name)
         if not os.path.exists(self.path_to_save):
             os.makedirs(self.path_to_save)
-
-    @staticmethod
-    def __update_network_kwargs(network, network_kwargs, additional_channel):
-        if not network_kwargs:
-            network_kwargs = dict()
-
-        if network == 'unet':
-            network_kwargs['in_channels'] = 4 if additional_channel else 3
-            network_kwargs['classes'] = 1
-        return network_kwargs
 
     def __train(self, train_dataloader, validation_dataloader, fold=0):
         network = NETWORKS[self.network](**self.network_kwargs) if not self.backbone else \
@@ -181,7 +166,7 @@ class Model:
                     image = self.resize[0](image[:])
                 network_input = image
                 if self.backbone:
-                    network_input = torch.tensor([]).to(DEVICE)
+                    network_input = torch.tensor([], device=DEVICE)
                     for feature_extractor in self.feature_extractors:
                         network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
                             network_input.shape[0] != 0 else feature_extractor(image)[-1]
@@ -209,7 +194,7 @@ class Model:
                     image = self.resize[0](image[:])
                 network_input = image
                 if self.backbone:
-                    network_input = torch.tensor([]).to(DEVICE)
+                    network_input = torch.tensor([], device=DEVICE)
                     for feature_extractor in self.feature_extractors:
                         network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
                             network_input.shape[0] != 0 else feature_extractor(image)[-1]
@@ -256,6 +241,17 @@ class Model:
         )
         torch.save(self.network_archives[fold - 1]['network'], os.path.join(self.path_to_save, filename))
         print('Model Saved')
+
+    def load_networks(self):
+        networks = list()
+        network = NETWORKS[self.network](**self.network_kwargs)
+        network_filenames = os.listdir(self.path_to_save)
+        filenames_to_load = [filename for filename in network_filenames if filename[:len(self.name) + 6] == f'{self.name}_fold_'] if \
+            self.k_fold else [sorted(network_filenames)[-1]]  # [sorted(network_filenames)[-1]] <- best among all in the directory
+        for filename in filenames_to_load:
+            network.load_state_dict(torch.load(os.path.join(self.path_to_save, filename), map_location=DEVICE))
+            networks.append(network.to(DEVICE))
+        return networks
 
     def train(self):
         if not self.k_fold:
