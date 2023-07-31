@@ -8,7 +8,7 @@ import torch
 import torchvision
 import tqdm
 
-from config import DEVICE, MODELS, NUM_WORKERS, Path
+from config import DEVICE, MODELS, NUM_WORKERS, SEED, Path
 from dataset import Dataset
 from network import NETWORKS
 
@@ -24,6 +24,7 @@ OPTIMIZERS = {
 }
 
 SCHEDULER = {
+    'cosine_annealing': torch.optim.lr_scheduler.CosineAnnealingLR,
     'cosine_annealing_warm_restarts': torch.optim.lr_scheduler.CosineAnnealingWarmRestarts,
     'exponential': torch.optim.lr_scheduler.ExponentialLR,
     'reduce_on_plateau': torch.optim.lr_scheduler.ReduceLROnPlateau
@@ -72,8 +73,10 @@ class Model:
         self.scheduler = scheduler.lower()
         self.scheduler_kwargs = scheduler_kwargs
         if not self.scheduler_kwargs:
-            if self.scheduler == 'cosine_annealing_warm_restarts':
-                self.scheduler_kwargs = dict(T_0=6, T_mult=2, eta_min=0.00001)
+            if self.scheduler == 'cosine_annealing':
+                self.scheduler_kwargs = dict(T_max=20, eta_min=1e-6)
+            elif self.scheduler == 'cosine_annealing_warm_restarts':
+                self.scheduler_kwargs = dict(T_0=6, T_mult=2, eta_min=1e-6)
             elif self.scheduler == 'exponential':
                 self.scheduler_kwargs = dict(gamma=0.95)
             elif self.scheduler == 'reduce_on_plateau':
@@ -83,7 +86,7 @@ class Model:
         self.augmentations = augmentations
         self.dataset_variant = 'classes' if self.network == 'cls' else None
         self.resize_factor = resize_factor
-        self.filter = filter
+        self.filter = None if not filter else lambda dataset, indices: [index for index in indices if len(torch.unique(dataset[index][1])) == 2]
 
         self.resize = None
         if self.resize_factor != 1:
@@ -126,13 +129,10 @@ class Model:
         self.train_dataset = Dataset(additional_channel=self.additional_channel, augmentations=self.augmentations, variant=self.dataset_variant)
         self.validation_dataset = Dataset(additional_channel=self.additional_channel, augmentations=False, variant=self.dataset_variant)
         self.dataloader_kwargs = dict(num_workers=NUM_WORKERS, pin_memory=True if DEVICE == torch.device('cuda') else False)
-        if self.filter:
-            indices_to_keep = list()
-            for i, (_, target) in enumerate(self.train_dataset):
-                if len(torch.unique(target)) == 2:
-                    indices_to_keep.append(i)
-            self.train_dataset = torch.utils.data.Subset(self.train_dataset, indices_to_keep)
-            self.validation_dataset = torch.utils.data.Subset(self.validation_dataset, indices_to_keep)
+        self.train_indices, self.validation_indices = sklearn.model_selection.train_test_split(
+            range(len(self.train_dataset)), test_size=1 - self.train_test_ratio,
+            train_size=self.train_test_ratio, random_state=SEED
+        )
 
         self.metric = metric
         self.network_archives = list()
@@ -140,12 +140,38 @@ class Model:
         if not os.path.exists(self.path_to_save):
             os.makedirs(self.path_to_save)
 
-    def __train(self, train_dataloader, validation_dataloader, fold=0):
+        torch.backends.cudnn.benchmark = True if DEVICE == torch.device('cuda') else False
+
+    @staticmethod
+    def __cuda_automatic_mixed_precision_autocast(func):
+        if DEVICE != torch.device('cuda'):
+            return func()
+        else:  # if CUDA, use automatic mixed precision
+            with torch.cuda.amp.autocast():
+                return func()
+
+    def __train(self, train_indices, validation_indices, fold=0):
+        if self.filter:
+            train_indices = self.filter(self.train_dataset, train_indices)
+            validation_indices = self.filter(self.validation_dataset, validation_indices)
+
+        train_dataloader = torch.utils.data.DataLoader(
+            self.train_dataset, batch_size=self.batch_size,
+            sampler=torch.utils.data.SubsetRandomSampler(train_indices),
+            **self.dataloader_kwargs
+        )
+        validation_dataloader = torch.utils.data.DataLoader(
+            self.validation_dataset, batch_size=self.batch_size,
+            sampler=torch.utils.data.SubsetRandomSampler(validation_indices),
+            **self.dataloader_kwargs
+        )
+
         network = NETWORKS[self.network](**self.network_kwargs) if not self.backbone else \
             NETWORKS[self.head_network](**self.head_network_kwargs)
         criterion = CRITERION[self.criterion]
         optimizer = OPTIMIZERS[self.optimizer](network.parameters(), lr=self.learning_rate)
         scheduler = SCHEDULER[self.scheduler](optimizer, verbose=True, **self.scheduler_kwargs)
+        scaler = torch.cuda.amp.GradScaler() if DEVICE == torch.device('cuda') else None
 
         network.to(DEVICE)
         metric = 0
@@ -161,21 +187,31 @@ class Model:
             cumulative_loss = 0
             for i, (image, target) in pbar:
                 image, target = image.to(DEVICE), target.to(DEVICE)
-                optimizer.zero_grad()  # clear gradients for every batch
                 if self.resize:
                     image = self.resize[0](image[:])
                 network_input = image
                 if self.backbone:
                     network_input = torch.tensor([], device=DEVICE)
                     for feature_extractor in self.feature_extractors:
-                        network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
-                            network_input.shape[0] != 0 else feature_extractor(image)[-1]
-                prediction = network(network_input)  # feedforward
-                if self.resize and self.dataset_variant != 'classes':
-                    prediction = self.resize[1](prediction[:])
-                loss = criterion(prediction, target)  # calculate loss
-                loss.backward()  # backpropagation
-                optimizer.step()  # update parameters
+                        feature_volume = self.__cuda_automatic_mixed_precision_autocast(lambda: feature_extractor(image)[-1])
+                        network_input = torch.cat((network_input, feature_volume), dim=1) if network_input.shape[0] != 0 else feature_volume
+                optimizer.zero_grad()  # clear gradients for every batch
+                if DEVICE != torch.device('cuda'):
+                    prediction = network(network_input)  # feedforward
+                    if self.resize and self.dataset_variant != 'classes':
+                        prediction = self.resize[1](prediction[:])
+                    loss = criterion(prediction, target)  # calculate loss
+                    loss.backward()  # backpropagation
+                    optimizer.step()  # update parameters
+                else:  # if CUDA, use automatic mixed precision
+                    with torch.cuda.amp.autocast():
+                        prediction = network(network_input)
+                        if self.resize and self.dataset_variant != 'classes':
+                            prediction = self.resize[1](prediction[:])
+                        loss = criterion(prediction, target)
+                    scaler.scale(loss).backward()
+                    scaler.step(optimizer)
+                    scaler.update()
                 cumulative_loss += loss.item()
                 pbar.set_postfix(dict([(self.criterion, sigfig.round(cumulative_loss / (i + 1), sigfigs=3))]))
             network_archive['train losses'].append(cumulative_loss / len(train_dataloader))
@@ -196,11 +232,11 @@ class Model:
                 if self.backbone:
                     network_input = torch.tensor([], device=DEVICE)
                     for feature_extractor in self.feature_extractors:
-                        network_input = torch.cat((network_input, feature_extractor(image)[-1]), dim=1) if \
-                            network_input.shape[0] != 0 else feature_extractor(image)[-1]
-                prediction = network(network_input)
-                if self.resize and self.dataset_variant != 'classes':
-                    prediction = self.resize[1](prediction[:])
+                        feature_volume = self.__cuda_automatic_mixed_precision_autocast(lambda: feature_extractor(image)[-1])
+                        network_input = torch.cat((network_input, feature_volume), dim=1) if network_input.shape[0] != 0 else feature_volume
+                prediction = self.__cuda_automatic_mixed_precision_autocast(
+                    lambda: network(network_input) if not self.resize or self.dataset_variant == 'classes' else self.resize[1](network(network_input)[:])
+                )
                 cumulative_loss += criterion(prediction, target).item()
                 if self.metric == 'global_dice_coefficient':
                     metric = (metric * i + 1 - CRITERION['dice_loss'](prediction, target).item()) / (i + 1)
@@ -255,36 +291,16 @@ class Model:
 
     def train(self):
         if not self.k_fold:
-            train_indices, validation_indices = sklearn.model_selection.train_test_split(
-                range(len(self.train_dataset)), test_size=1 - self.train_test_ratio, train_size=self.train_test_ratio
-            )
-            train_dataloader = torch.utils.data.DataLoader(
-                self.train_dataset, batch_size=self.batch_size,
-                sampler=torch.utils.data.SubsetRandomSampler(train_indices),
-                **self.dataloader_kwargs
-            )
-            validation_dataloader = torch.utils.data.DataLoader(
-                self.validation_dataset, batch_size=self.batch_size,
-                sampler=torch.utils.data.SubsetRandomSampler(validation_indices),
-                **self.dataloader_kwargs
-            )
-            self.__train(train_dataloader, validation_dataloader)
+            self.__train(self.train_indices, self.validation_indices)
             self.plot()
             self.save_network()
         else:  # K-Fold Cross Validation
-            k_fold = sklearn.model_selection.KFold(n_splits=self.k_fold, shuffle=True)
-            for fold, (train_indices, validation_indices) in enumerate(k_fold.split(self.train_dataset), start=1):
-                train_dataloader = torch.utils.data.DataLoader(
-                    self.train_dataset, batch_size=self.batch_size,
-                    sampler=torch.utils.data.SubsetRandomSampler(train_indices),
-                    **self.dataloader_kwargs
-                )
-                validation_dataloader = torch.utils.data.DataLoader(
-                    self.validation_dataset, batch_size=self.batch_size,
-                    sampler=torch.utils.data.SubsetRandomSampler(validation_indices),
-                    **self.dataloader_kwargs
-                )
-                self.__train(train_dataloader, validation_dataloader, fold=fold)
+            k_fold = sklearn.model_selection.KFold(n_splits=self.k_fold, shuffle=True, random_state=SEED)
+            k_folds = k_fold.split(self.train_indices)
+            for fold, (train_indices_indices, validation_indices_indices) in enumerate(k_folds, start=1):
+                train_indices = [self.train_indices[train_indices_index] for train_indices_index in train_indices_indices]
+                validation_indices = [self.train_indices[validation_indices_index] for validation_indices_index in validation_indices_indices]
+                self.__train(train_indices, validation_indices, fold=fold)
                 self.plot(fold)
                 self.save_network(fold)
 

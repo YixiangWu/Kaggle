@@ -156,142 +156,6 @@
 
     "Backbone":
     {
-        "backbone_unet_resnext50_32x4d": {
-            "name": "backbone_unet_resnext50_32x4d",
-            "epoch": 35,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "unet",
-            "network_kwargs": {
-                "encoder_name": "resnext50_32x4d",
-                "encoder_weights": "imagenet",
-                "activation": null
-            },
-            "criterion": "bce_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.0005,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 5,
-                "T_mult": 2,
-                "eta_min": 0
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": null,
-            "metric": "global_dice_coefficient"
-        },
-
-        "backbone_unet_efficientnet_b0": {
-            "name": "backbone_unet_efficientnet_b0",
-            "epoch": 35,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "unet",
-            "network_kwargs": {
-                "encoder_name": "efficientnet-b0",
-                "encoder_weights": "imagenet",
-                "activation": null
-            },
-            "criterion": "bce_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.001,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 5,
-                "T_mult": 2,
-                "eta_min": 1e-7
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": null,
-            "metric": "global_dice_coefficient"
-        },
-
-        "backbone_unet_efficientnet_b1": {
-            "name": "backbone_unet_efficientnet_b1",
-            "epoch": 35,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "unet",
-            "network_kwargs": {
-                "encoder_name": "efficientnet-b1",
-                "encoder_weights": "imagenet",
-                "activation": null
-            },
-            "criterion": "bce_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.001,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 5,
-                "T_mult": 2,
-                "eta_min": 1e-7
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": null,
-            "metric": "global_dice_coefficient"
-        },
-
-        "backbone_unet_resnet18": {
-            "name": "backbone_unet_resnet18",
-            "epoch": 35,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "unet",
-            "network_kwargs": {
-                "encoder_name": "resnet18",
-                "encoder_weights": "imagenet",
-                "activation": null
-            },
-            "criterion": "bce_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.0005,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 5,
-                "T_mult": 2,
-                "eta_min": 0
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": null,
-            "metric": "global_dice_coefficient"
-        },
-
         "backbone_unet_resnet34": {
             "name": "backbone_unet_resnet34",
             "epoch": 35,
@@ -301,8 +165,7 @@
             "network": "unet",
             "network_kwargs": {
                 "encoder_name": "resnet34",
-                "encoder_weights": "imagenet",
-                "activation": null
+                "encoder_weights": "imagenet"
             },
             "criterion": "bce_loss",
             "optimizer": "adam",
@@ -335,8 +198,271 @@
             "network": "unet",
             "network_kwargs": {
                 "encoder_name": "resnet50",
-                "encoder_weights": "imagenet",
-                "activation": null
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnet101": {
+            "name": "backbone_unet_resnet101",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "resnet101",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnet152": {
+            "name": "backbone_unet_resnet152",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "resnet152",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnext50_32x4d": {
+            "name": "backbone_unet_resnext50_32x4d",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "resnext50_32x4d",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnext101_32x8d": {
+            "name": "backbone_unet_resnext101_32x8d",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "resnext101_32x8d",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnest14d": {
+            "name": "backbone_unet_resnest14d",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "timm-resnest14d",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnest26d": {
+            "name": "backbone_unet_resnest26d",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "timm-resnest26d",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_densenet121": {
+            "name": "backbone_unet_densenet121",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "densenet121",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0005,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_densenet169": {
+            "name": "backbone_unet_densenet169",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "densenet169",
+                "encoder_weights": "imagenet"
             },
             "criterion": "bce_loss",
             "optimizer": "adam",
@@ -363,177 +489,9 @@
 
     "Classification":
     {
-        "classification_backbone_unet_resnext50_32x4d": {
-            "name": "classification_backbone_unet_resnext50_32x4d",
-            "epoch": 39,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "cls",
-            "network_kwargs": null,
-            "criterion": "cross_entropy_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.0001,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-6
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": {
-                "feature_extractors": [
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_resnext50_32x4d",
-                        "module": "encoder"
-                    }
-                ],
-                "head": {
-                    "network": "cls_head",
-                    "network_kwargs": null
-                }
-            },
-            "metric": "accuracy"
-        },
-
-        "classification_backbone_unet_efficientnet_b0": {
-            "name": "classification_backbone_unet_efficientnet_b0",
-            "epoch": 39,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "cls",
-            "network_kwargs": null,
-            "criterion": "cross_entropy_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.0001,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-6
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": {
-                "feature_extractors": [
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b0",
-                        "module": "encoder"
-                    }
-                ],
-                "head": {
-                    "network": "cls_head",
-                    "network_kwargs": null
-                }
-            },
-            "metric": "accuracy"
-        },
-
-        "classification_backbone_unet_efficientnet_b1": {
-            "name": "classification_backbone_unet_efficientnet_b1",
-            "epoch": 39,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "cls",
-            "network_kwargs": null,
-            "criterion": "cross_entropy_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.0001,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-6
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": {
-                "feature_extractors": [
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b1",
-                        "module": "encoder"
-                    }
-                ],
-                "head": {
-                    "network": "cls_head",
-                    "network_kwargs": null
-                }
-            },
-            "metric": "accuracy"
-        },
-
-        "classification_backbone_unet_resnet18": {
-            "name": "classification_backbone_unet_resnet18",
-            "epoch": 39,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "cls",
-            "network_kwargs": null,
-            "criterion": "cross_entropy_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.0001,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-6
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": {
-                "feature_extractors": [
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_resnet18",
-                        "module": "encoder"
-                    }
-                ],
-                "head": {
-                    "network": "cls_head",
-                    "network_kwargs": null
-                }
-            },
-            "metric": "accuracy"
-        },
-
         "classification_backbone_unet_resnet34": {
             "name": "classification_backbone_unet_resnet34",
-            "epoch": 39,
+            "epoch": 30,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
@@ -542,11 +500,10 @@
             "criterion": "cross_entropy_loss",
             "optimizer": "adam",
             "learning_rate": 0.0001,
-            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler": "cosine_annealing",
             "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-6
+                "T_max": 30,
+                "eta_min": 0
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
@@ -575,7 +532,7 @@
 
         "classification_backbone_unet_resnet50": {
             "name": "classification_backbone_unet_resnet50",
-            "epoch": 39,
+            "epoch": 30,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
@@ -584,11 +541,10 @@
             "criterion": "cross_entropy_loss",
             "optimizer": "adam",
             "learning_rate": 0.0001,
-            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler": "cosine_annealing",
             "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-6
+                "T_max": 30,
+                "eta_min": 0
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
@@ -615,9 +571,9 @@
             "metric": "accuracy"
         },
 
-        "classification_backbone_unet_resnext50_32x4d_and_efficientnet_b0": {
-            "name": "classification_backbone_unet_resnext50_32x4d_and_efficientnet_b0",
-            "epoch": 39,
+        "classification_backbone_unet_resnet101": {
+            "name": "classification_backbone_unet_resnet101",
+            "epoch": 30,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
@@ -626,11 +582,92 @@
             "criterion": "cross_entropy_loss",
             "optimizer": "adam",
             "learning_rate": 0.0001,
-            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler": "cosine_annealing",
             "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-6
+                "T_max": 30,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnet101",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_resnet152": {
+            "name": "classification_backbone_unet_resnet152",
+            "epoch": 30,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 30,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnet152",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_resnext50_32x4d": {
+            "name": "classification_backbone_unet_resnext50_32x4d",
+            "epoch": 30,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 30,
+                "eta_min": 0
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
@@ -647,11 +684,6 @@
                         "category": "Backbone",
                         "name": "backbone_unet_resnext50_32x4d",
                         "module": "encoder"
-                    },
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b0",
-                        "module": "encoder"
                     }
                 ],
                 "head": {
@@ -662,22 +694,21 @@
             "metric": "accuracy"
         },
 
-        "classification_backbone_unet_resnext50_32x4d_and_efficientnets": {
-            "name": "classification_backbone_unet_resnext50_32x4d_and_efficientnets",
-            "epoch": 39,
-            "batch_size": 16,
+        "classification_backbone_unet_resnext101_32x8d": {
+            "name": "classification_backbone_unet_resnext101_32x8d",
+            "epoch": 30,
+            "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
             "network": "cls",
             "network_kwargs": null,
             "criterion": "cross_entropy_loss",
             "optimizer": "adam",
-            "learning_rate": 0.00005,
-            "scheduler": "cosine_annealing_warm_restarts",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
             "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-7
+                "T_max": 30,
+                "eta_min": 0
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
@@ -690,6 +721,221 @@
             "filter": false,
             "backbone": {
                 "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnext101_32x8d",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_resnest14d": {
+            "name": "classification_backbone_unet_resnest14d",
+            "epoch": 30,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 30,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnest14d",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_resnest26d": {
+            "name": "classification_backbone_unet_resnest26d",
+            "epoch": 30,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 30,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnest26d",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_densenet121": {
+            "name": "classification_backbone_unet_densenet121",
+            "epoch": 30,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 30,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_densenet121",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_unet_densenet169": {
+            "name": "classification_backbone_unet_densenet169",
+            "epoch": 30,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 30,
+                "eta_min": 0
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_densenet169",
+                        "module": "encoder"
+                    }
+                ],
+                "head": {
+                    "network": "cls_head",
+                    "network_kwargs": null
+                }
+            },
+            "metric": "accuracy"
+        },
+
+        "classification_backbone_ensemble": {
+            "name": "classification_backbone_ensemble",
+            "epoch": 30,
+            "batch_size": 8,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "cls",
+            "network_kwargs": null,
+            "criterion": "cross_entropy_loss",
+            "optimizer": "adam",
+            "learning_rate": 1e-6,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 30,
+                "eta_min": 1e-8
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": {
+                "feature_extractors": [
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnet101",
+                        "module": "encoder"
+                    },
+                    {
+                        "category": "Backbone",
+                        "name": "backbone_unet_resnet152",
+                        "module": "encoder"
+                    },
                     {
                         "category": "Backbone",
                         "name": "backbone_unet_resnext50_32x4d",
@@ -697,69 +943,17 @@
                     },
                     {
                         "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b0",
+                        "name": "backbone_unet_resnext101_32x8d",
                         "module": "encoder"
                     },
                     {
                         "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b1",
-                        "module": "encoder"
-                    }
-                ],
-                "head": {
-                    "network": "cls_head",
-                    "network_kwargs": null
-                }
-            },
-            "metric": "accuracy"
-        },
-
-        "classification_backbone_unet_efficientnets_and_resnets": {
-            "name": "classification_backbone_unet_efficientnets_and_resnets",
-            "epoch": 39,
-            "batch_size": 16,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "cls",
-            "network_kwargs": null,
-            "criterion": "cross_entropy_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.00005,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 3,
-                "eta_min": 1e-7
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": {
-                "horizontal_flip": 0.5,
-                "vertical_flip": 0.5,
-                "rotate": 0.75
-            },
-            "resize_factor": 1.5,
-            "filter": false,
-            "backbone": {
-                "feature_extractors": [
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b0",
+                        "name": "backbone_unet_resnest14d",
                         "module": "encoder"
                     },
                     {
                         "category": "Backbone",
-                        "name": "backbone_unet_efficientnet_b1",
-                        "module": "encoder"
-                    },
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_resnet34",
-                        "module": "encoder"
-                    },
-                    {
-                        "category": "Backbone",
-                        "name": "backbone_unet_resnet50",
+                        "name": "backbone_unet_resnest26d",
                         "module": "encoder"
                     }
                 ],
@@ -774,182 +968,118 @@
 
     "Segmentation":
     {
-        "segmentation_unet_efficientnet_b0": {
-            "name": "segmentation_unet_efficientnet_b0",
-            "epoch": 21,
+        "segmentation_unetplusplus_resnet18": {
+            "name": "segmentation_unetplusplus_resnet18",
+            "epoch": 35,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
-            "network": "unet",
+            "network": "unet++",
             "network_kwargs": {
-                "encoder_name": "efficientnet-b0",
-                "encoder_weights": "imagenet",
-                "activation": null
+                "encoder_name": "resnet18",
+                "encoder_weights": "imagenet"
             },
             "criterion": "dice_loss",
             "optimizer": "adam",
-            "learning_rate": 0.005,
+            "learning_rate": 0.001,
             "scheduler": "cosine_annealing_warm_restarts",
             "scheduler_kwargs": {
-                "T_0": 3,
+                "T_0": 5,
                 "T_mult": 2,
                 "eta_min": 1e-7
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
-            "resize_factor": 1,
-            "filter": true,
+            "resize_factor": 2,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unetplusplus_resnet34": {
+            "name": "segmentation_unetplusplus_resnet34",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet++",
+            "network_kwargs": {
+                "encoder_name": "resnet34",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 2,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         },
 
         "segmentation_unetplusplus_efficientnet_b0": {
             "name": "segmentation_unetplusplus_efficientnet_b0",
-            "epoch": 21,
+            "epoch": 35,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
             "network": "unet++",
             "network_kwargs": {
                 "encoder_name": "efficientnet-b0",
-                "encoder_weights": "imagenet",
-                "activation": null
+                "encoder_weights": "imagenet"
             },
             "criterion": "dice_loss",
             "optimizer": "adam",
-            "learning_rate": 0.005,
+            "learning_rate": 0.001,
             "scheduler": "cosine_annealing_warm_restarts",
             "scheduler_kwargs": {
-                "T_0": 3,
+                "T_0": 5,
                 "T_mult": 2,
                 "eta_min": 1e-7
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
-            "resize_factor": 1,
-            "filter": true,
+            "resize_factor": 2,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         },
 
         "segmentation_unetplusplus_efficientnet_b1": {
             "name": "segmentation_unetplusplus_efficientnet_b1",
-            "epoch": 21,
+            "epoch": 35,
             "batch_size": 32,
             "k_fold": null,
             "voting_ensemble": null,
             "network": "unet++",
             "network_kwargs": {
                 "encoder_name": "efficientnet-b1",
-                "encoder_weights": "imagenet",
-                "activation": null
+                "encoder_weights": "imagenet"
             },
             "criterion": "dice_loss",
             "optimizer": "adam",
-            "learning_rate": 0.005,
+            "learning_rate": 0.001,
             "scheduler": "cosine_annealing_warm_restarts",
             "scheduler_kwargs": {
-                "T_0": 3,
+                "T_0": 5,
                 "T_mult": 2,
                 "eta_min": 1e-7
             },
             "train_test_ratio": 0.9,
             "additional_channel": false,
             "augmentations": null,
-            "resize_factor": 1,
-            "filter": true,
-            "backbone": null,
-            "metric": "global_dice_coefficient"
-        },
-
-        "segmentation_unetplusplus_efficientnet_b2": {
-            "name": "segmentation_unetplusplus_efficientnet_b2",
-            "epoch": 21,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "unet++",
-            "network_kwargs": {
-                "encoder_name": "efficientnet-b2",
-                "encoder_weights": "imagenet",
-                "activation": null
-            },
-            "criterion": "dice_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.005,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 2,
-                "eta_min": 1e-7
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": null,
-            "resize_factor": 1,
-            "filter": true,
-            "backbone": null,
-            "metric": "global_dice_coefficient"
-        },
-
-        "segmentation_unetplusplus_efficientnet_b3": {
-            "name": "segmentation_unetplusplus_efficientnet_b3",
-            "epoch": 21,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "unet++",
-            "network_kwargs": {
-                "encoder_name": "efficientnet-b3",
-                "encoder_weights": "imagenet",
-                "activation": null
-            },
-            "criterion": "dice_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.005,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 2,
-                "eta_min": 1e-7
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": null,
-            "resize_factor": 1,
-            "filter": true,
-            "backbone": null,
-            "metric": "global_dice_coefficient"
-        },
-
-        "segmentation_unetplusplus_efficientnet_b4": {
-            "name": "segmentation_unetplusplus_efficientnet_b4",
-            "epoch": 21,
-            "batch_size": 32,
-            "k_fold": null,
-            "voting_ensemble": null,
-            "network": "unet++",
-            "network_kwargs": {
-                "encoder_name": "efficientnet-b4",
-                "encoder_weights": "imagenet",
-                "activation": null
-            },
-            "criterion": "dice_loss",
-            "optimizer": "adam",
-            "learning_rate": 0.005,
-            "scheduler": "cosine_annealing_warm_restarts",
-            "scheduler_kwargs": {
-                "T_0": 3,
-                "T_mult": 2,
-                "eta_min": 1e-7
-            },
-            "train_test_ratio": 0.9,
-            "additional_channel": false,
-            "augmentations": null,
-            "resize_factor": 1,
-            "filter": true,
+            "resize_factor": 2,
+            "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
         }

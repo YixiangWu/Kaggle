@@ -31,16 +31,18 @@ class ClassificationHead(torch.nn.Module):
         for i in range(linear_layers):
             out_channels = in_channels // factor if i < linear_layers - 1 else 2
             layers.append(torch.nn.Linear(in_channels, out_channels, bias=True))
-            layers.append(torch.nn.BatchNorm1d(out_channels))
-            layers.append(torch.nn.ReLU(inplace=True))
-            in_channels = out_channels
+            if i != linear_layers - 1:
+                torch.nn.init.constant_(layers[-1].bias, 0)
+                torch.nn.init.kaiming_normal_(layers[-1].weight, nonlinearity='relu')
+                layers.append(torch.nn.BatchNorm1d(out_channels))
+                layers.append(torch.nn.ReLU(inplace=True))
+                in_channels = out_channels
+            else:
+                torch.nn.init.constant_(layers[-1].bias, 0)
+                torch.nn.init.xavier_normal_(layers[-1].weight, gain=torch.nn.init.calculate_gain('tanh'))
+                layers.append(torch.nn.Tanh())
 
-        self.head = torch.nn.Sequential(torch.nn.AdaptiveAvgPool2d(1), torch.nn.Flatten(), *layers)
-
-        for module in self.head.modules():
-            if isinstance(module, torch.nn.Linear):
-                torch.nn.init.kaiming_normal_(module.weight, nonlinearity='relu')
-                torch.nn.init.constant_(module.bias, 0)
+        self.head = torch.nn.Sequential(torch.nn.AdaptiveAvgPool2d(1), torch.nn.Flatten(), *layers, torch.nn.Tanh())
 
     def forward(self, feature_volume):
         return self.head(feature_volume)
