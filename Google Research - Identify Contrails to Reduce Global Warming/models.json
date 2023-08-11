@@ -26,6 +26,7 @@
             "resize_factor": 1,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -57,6 +58,7 @@
             "resize_factor": 1,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -88,6 +90,7 @@
             "resize_factor": 1,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -119,6 +122,7 @@
             "resize_factor": 1,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -150,6 +154,7 @@
             "resize_factor": 1,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         }
     },
@@ -186,6 +191,43 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "backbone_unet_resnet34_finalize": {
+            "name": "backbone_unet_resnet34_finalize",
+            "epoch": 20,
+            "batch_size": 32,
+            "k_fold": null,
+            "voting_ensemble": null,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "resnet34",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "bce_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.0001,
+            "scheduler": "cosine_annealing",
+            "scheduler_kwargs": {
+                "T_max": 20,
+                "eta_min": 1e-8
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": {
+                "horizontal_flip": 0.5,
+                "vertical_flip": 0.5,
+                "rotate": 0.75
+            },
+            "resize_factor": 1.5,
+            "filter": false,
+            "backbone": null,
+            "checkpoint": {
+                "category": "Backbone",
+                "name": "backbone_unet_resnet34"
+            },
             "metric": "global_dice_coefficient"
         },
 
@@ -219,6 +261,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -252,6 +295,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -285,6 +329,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -318,6 +363,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -351,6 +397,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -384,6 +431,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -417,6 +465,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -450,6 +499,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -483,6 +533,7 @@
             "resize_factor": 1.5,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         }
     },
@@ -527,6 +578,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -568,6 +620,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -609,6 +662,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -650,6 +704,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -691,6 +746,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -732,6 +788,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -773,6 +830,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -814,6 +872,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -855,6 +914,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -896,6 +956,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         },
 
@@ -962,6 +1023,7 @@
                     "network_kwargs": null
                 }
             },
+            "checkpoint": null,
             "metric": "accuracy"
         }
     },
@@ -994,6 +1056,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1023,6 +1086,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1052,6 +1116,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1081,6 +1146,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1110,6 +1176,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1139,6 +1206,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1168,6 +1236,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1197,6 +1266,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1226,6 +1296,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         },
 
@@ -1255,6 +1326,7 @@
             "resize_factor": 2,
             "filter": false,
             "backbone": null,
+            "checkpoint": null,
             "metric": "global_dice_coefficient"
         }
     }

@@ -52,6 +52,7 @@ class Model:
             resize_factor=1,
             filter=False,
             backbone=None,
+            checkpoint=None,
             metric='global_dice_coefficient'
     ):
         self.name = name
@@ -126,6 +127,12 @@ class Model:
             self.network_kwargs['feature_extractors'] = self.feature_extractors
             self.network_kwargs['head'] = NETWORKS[self.head_network](**self.head_network_kwargs)
 
+        self.checkpoint_paths = None
+        if checkpoint:
+            checkpoint_model = Model(**MODELS[checkpoint['category']][checkpoint['name']])
+            assert checkpoint_model.k_fold == self.k_fold
+            self.checkpoint_paths = checkpoint_model.__load_network_paths()
+
         self.train_dataset = Dataset(additional_channel=self.additional_channel, augmentations=self.augmentations, variant=self.dataset_variant)
         self.validation_dataset = Dataset(additional_channel=self.additional_channel, augmentations=False, variant=self.dataset_variant)
         self.dataloader_kwargs = dict(num_workers=NUM_WORKERS, pin_memory=True if DEVICE == torch.device('cuda') else False)
@@ -172,6 +179,9 @@ class Model:
         optimizer = OPTIMIZERS[self.optimizer](network.parameters(), lr=self.learning_rate)
         scheduler = SCHEDULER[self.scheduler](optimizer, verbose=True, **self.scheduler_kwargs)
         scaler = torch.cuda.amp.GradScaler() if DEVICE == torch.device('cuda') else None
+
+        if self.checkpoint_paths:  # load checkpoint
+            network.load_state_dict(torch.load(sorted(self.checkpoint_paths)[fold], map_location=DEVICE))
 
         network.to(DEVICE)
         metric = 0
@@ -278,15 +288,18 @@ class Model:
         torch.save(self.network_archives[fold - 1]['network'], os.path.join(self.path_to_save, filename))
         print('Model Saved')
 
-    def load_networks(self):
-        networks = list()
-        network = NETWORKS[self.network](**self.network_kwargs)
+    def __load_network_paths(self):
         network_filenames = os.listdir(self.path_to_save)
         filenames_to_load = [filename for filename in network_filenames if filename[:len(self.name) + 6] == f'{self.name}_fold_'] if \
             self.k_fold else [sorted(network_filenames)[-1]]  # [sorted(network_filenames)[-1]] <- best among all in the directory
-        for filename in filenames_to_load:
-            network.load_state_dict(torch.load(os.path.join(self.path_to_save, filename), map_location=DEVICE))
-            networks.append(network.to(DEVICE))
+        return [os.path.join(self.path_to_save, filename) for filename in filenames_to_load]
+
+    def load_networks(self):
+        networks = list()
+        network = NETWORKS[self.network](**self.network_kwargs)
+        for path in self.__load_network_paths():
+            network.load_state_dict(torch.load(path, map_location=DEVICE))
+            networks.append(network)
         return networks
 
     def train(self):

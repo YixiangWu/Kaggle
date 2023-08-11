@@ -72,6 +72,6 @@
 | # |                  Classification                   |         Segmentation          | Global Dice Coefficient (Kaggle Score) |
 |:-:|:-------------------------------------------------:|:-----------------------------:|:--------------------------------------:|
 | 2 |  Classification Ensemble* (0.924) (Threshold=0)   | Segmentation#2 (Threshold=-5) |    Public: 66831, Private: 0.66062     |
-| 1 | Classification Ensemble* (0.924) (Threshold=1.75) | Segmentation#1 (Threshold=0)  |    Public: 66468, Private: 0.65499     |
+| 1 | Classification Ensemble* (0.924) (Threshold=1.75) | Segmentation#2 (Threshold=0)  |    Public: 66468, Private: 0.65499     |
 
 Final Submissions#2 ranks 158/954(**Top 17%**)
