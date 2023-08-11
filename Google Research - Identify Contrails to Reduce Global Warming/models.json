@@ -1082,6 +1082,180 @@
             "filter": false,
             "backbone": null,
             "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unetplusplus_efficientnet_v2_b3_kfold_5": {
+            "name": "segmentation_unetplusplus_efficientnet_v2_b3_kfold_5",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": 5,
+            "voting_ensemble": false,
+            "network": "unet++",
+            "network_kwargs": {
+                "encoder_name": "tu-tf_efficientnetv2_b3.in21k_ft_in1k",
+                "encoder_weights": true
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 2,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unetplusplus_efficientnet_v2_s_kfold_5": {
+            "name": "segmentation_unetplusplus_efficientnet_v2_s_kfold_5",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": 5,
+            "voting_ensemble": false,
+            "network": "unet++",
+            "network_kwargs": {
+                "encoder_name": "tu-tf_efficientnetv2_s.in21k_ft_in1k",
+                "encoder_weights": true
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 2,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unet_efficientnet_b4_kfold_5": {
+            "name": "segmentation_unet_efficientnet_b4_kfold_5",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": 5,
+            "voting_ensemble": false,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "efficientnet-b4",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 2,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unet_inceptionv4_kfold_5": {
+            "name": "segmentation_unet_inceptionv4_kfold_5",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": 5,
+            "voting_ensemble": false,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "inceptionv4",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 2,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unet_resnest50d_kfold_5": {
+            "name": "segmentation_unet_resnest50d_kfold_5",
+            "epoch": 35,
+            "batch_size": 32,
+            "k_fold": 5,
+            "voting_ensemble": false,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "timm-resnest50d",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 2,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
+        },
+
+        "segmentation_unet_resnest101e_kfold_5": {
+            "name": "segmentation_unet_resnest101e_kfold_5",
+            "epoch": 35,
+            "batch_size": 28,
+            "k_fold": 5,
+            "voting_ensemble": false,
+            "network": "unet",
+            "network_kwargs": {
+                "encoder_name": "timm-resnest101e",
+                "encoder_weights": "imagenet"
+            },
+            "criterion": "dice_loss",
+            "optimizer": "adam",
+            "learning_rate": 0.001,
+            "scheduler": "cosine_annealing_warm_restarts",
+            "scheduler_kwargs": {
+                "T_0": 5,
+                "T_mult": 2,
+                "eta_min": 1e-7
+            },
+            "train_test_ratio": 0.9,
+            "additional_channel": false,
+            "augmentations": null,
+            "resize_factor": 2,
+            "filter": false,
+            "backbone": null,
+            "metric": "global_dice_coefficient"
         }
     }
 }

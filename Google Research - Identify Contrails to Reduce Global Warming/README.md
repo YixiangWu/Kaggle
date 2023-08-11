@@ -49,4 +49,29 @@
 | 2 | U-Net++ |    ResNet34    | ImageNet | Dice Loss | 0.345 |          0.655          |
 | 1 | U-Net++ |    ResNet18    | ImageNet | Dice Loss | 0.352 |          0.648          |
 
-## Classification Stage + Segmentation Stage
+### K-Fold Segmentation
+
+| # |  Model  |     Encoder      | Weights  | Criterion |       Global Dice Coefficient       |
+|:-:|:-------:|:----------------:|:--------:|:---------:|:-----------------------------------:|
+| 6 |  U-Net  |   ResNest101e    | ImageNet | Dice Loss | (0.663, 0.660, 0.663, 0.667, 0.663) |
+| 5 |  U-Net  |    ResNest50d    | ImageNet | Dice Loss | (0.664, 0.664, 0.662, 0.657, 0.663) |
+| 4 |  U-Net  |   InceptionV4    | ImageNet | Dice Loss | (0.660, 0.651, 0.653, 0.659, 0.655) |
+| 3 |  U-Net  |  EfficientnetB4  | ImageNet | Dice Loss | (0.665, 0.662, 0.665, 0.667, 0.663) |
+| 2 | U-Net++ | EfficientnetV2S  | ImageNet | Dice Loss | (0.657, 0.651, 0.656, 0.658, 0.652) |
+| 1 | U-Net++ | EfficientnetV2B3 | ImageNet | Dice Loss | (0.657, 0.658, 0.661, 0.657, 0.650) |
+
+### Segmentation Ensemble
+
+| # |            Network            |                           Ensemble Method                           |
+|:-:|:-----------------------------:|:-------------------------------------------------------------------:|
+| 2 | K-Fold Segmentation#3, #5, #6 |        Weighted Averaging Ensemble (Weights: 1.1, 0.8, 1.1)         |
+| 1 |    K-Fold Segmentation#1-6    | Weighted Averaging Ensemble (Weights: 0.8, 0.2, 1.5, 0.8, 1.2, 1.5) |
+
+## Classification Stage + Segmentation Stage (Final Submission)
+
+| # |                  Classification                   |         Segmentation          | Global Dice Coefficient (Kaggle Score) |
+|:-:|:-------------------------------------------------:|:-----------------------------:|:--------------------------------------:|
+| 2 |  Classification Ensemble* (0.924) (Threshold=0)   | Segmentation#2 (Threshold=-5) |    Public: 66831, Private: 0.66062     |
+| 1 | Classification Ensemble* (0.924) (Threshold=1.75) | Segmentation#1 (Threshold=0)  |    Public: 66468, Private: 0.65499     |
+
+Final Submissions#2 ranks 158/954(**Top 17%**)
